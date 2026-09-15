@@ -1,0 +1,92 @@
+{
+  "name": "ava-langgraph-inquiry-routing-engine",
+  "version": "0.2.1",
+  "description": "Inquiry Routing Engine for LangGraph.js — Graph-level orchestration of PDE-to-Inquiry pipelines with Four Directions routing, relational accountability gating, and multi-channel dispatch",
+  "type": "module",
+  "engines": {
+    "node": ">=18"
+  },
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js",
+      "require": "./dist/index.cjs"
+    },
+    "./graphs": {
+      "types": "./dist/graphs/index.d.ts",
+      "import": "./dist/graphs/index.js",
+      "require": "./dist/graphs/index.cjs"
+    },
+    "./nodes": {
+      "types": "./dist/nodes/index.d.ts",
+      "import": "./dist/nodes/index.js",
+      "require": "./dist/nodes/index.cjs"
+    }
+  },
+  "files": [
+    "dist",
+    "src"
+  ],
+  "scripts": {
+    "build": "tsup",
+    "build:compile": "tsup",
+    "dev": "tsup --watch",
+    "lint": "eslint src",
+    "lint:fix": "eslint src --fix",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "clean": "rm -rf dist"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/avadisabelle/avalangstack.git",
+    "directory": "@avalangstack/inquiry-routing-engine"
+  },
+  "keywords": [
+    "langgraph",
+    "inquiry",
+    "routing",
+    "pde",
+    "medicine-wheel",
+    "four-directions",
+    "relational",
+    "accountability",
+    "dispatch",
+    "graph"
+  ],
+  "author": "ava",
+  "license": "MIT",
+  "dependencies": {
+    "uuid": "^9.0.0"
+  },
+  "peerDependencies": {
+    "ava-langchain-prompt-decomposition": ">=0.1.11",
+    "ava-langchain-inquiry-routing": ">=0.1.11",
+    "@langchain/langgraph": "^1.4.15"
+  },
+  "peerDependenciesMeta": {
+    "ava-langchain-prompt-decomposition": {
+      "optional": false
+    },
+    "ava-langchain-inquiry-routing": {
+      "optional": false
+    },
+    "@langchain/langgraph": {
+      "optional": true
+    }
+  },
+  "devDependencies": {
+    "@langchain/core": "^1.1.48",
+    "@langchain/langgraph": "^1.4.15",
+    "@types/node": "^20.0.0",
+    "@types/uuid": "^9.0.0",
+    "ava-langchain-prompt-decomposition": ">=0.1.11",
+    "ava-langchain-inquiry-routing": "^0.1.11",
+    "eslint": "^8.0.0",
+    "tsup": "^8.0.0",
+    "typescript": "^5.3.0",
+    "vitest": "^1.0.0"
+  }
+}

@@ -1,0 +1,94 @@
+{
+  "name": "ava-langgraph-narrative-intelligence",
+  "version": "0.2.1",
+  "description": "Narrative Intelligence Toolkit for LangGraph.js - Three-universe processing and NCP analysis",
+  "type": "module",
+  "engines": {
+    "node": ">=18"
+  },
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js",
+      "require": "./dist/index.cjs"
+    },
+    "./schemas": {
+      "types": "./dist/schemas/index.d.ts",
+      "import": "./dist/schemas/index.js",
+      "require": "./dist/schemas/index.cjs"
+    },
+    "./graphs": {
+      "types": "./dist/graphs/index.d.ts",
+      "import": "./dist/graphs/index.js",
+      "require": "./dist/graphs/index.cjs"
+    },
+    "./nodes": {
+      "types": "./dist/nodes/index.d.ts",
+      "import": "./dist/nodes/index.js",
+      "require": "./dist/nodes/index.cjs"
+    },
+    "./integrations": {
+      "types": "./dist/integrations/index.d.ts",
+      "import": "./dist/integrations/index.js",
+      "require": "./dist/integrations/index.cjs"
+    }
+  },
+  "files": [
+    "dist",
+    "src"
+  ],
+  "scripts": {
+    "build": "tsup",
+    "build:compile": "tsup",
+    "dev": "tsup --watch",
+    "lint": "eslint src",
+    "lint:fix": "eslint src --fix",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "clean": "rm -rf dist",
+    "check:dts": "node ../../scripts/check-dts.mjs .",
+    "prepublishOnly": "tsup && node ../../scripts/check-dts.mjs ."
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/avadisabelle/avalangstack.git",
+    "directory": "@avalangstack/narrative-intelligence"
+  },
+  "keywords": [
+    "langgraph",
+    "narrative",
+    "intelligence",
+    "three-universe",
+    "ncp",
+    "storytelling"
+  ],
+  "author": "ava",
+  "license": "MIT",
+  "dependencies": {
+    "uuid": "^10.0.0"
+  },
+  "peerDependencies": {
+    "@langchain/langgraph": "^1.4.15",
+    "ioredis": ">=5.0.0"
+  },
+  "peerDependenciesMeta": {
+    "@langchain/langgraph": {
+      "optional": true
+    },
+    "ioredis": {
+      "optional": true
+    }
+  },
+  "devDependencies": {
+    "@langchain/langgraph": "^1.4.15",
+    "@types/node": "^20.0.0",
+    "@types/uuid": "^9.0.0",
+    "eslint": "^8.0.0",
+    "ioredis": "^5.0.0",
+    "tsup": "^8.0.0",
+    "typescript": "^5.0.0",
+    "vitest": "^1.0.0"
+  }
+}

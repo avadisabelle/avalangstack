@@ -1,4 +1,4 @@
-this will be the nest of the most probably consolidation of the `@avadisabelle/ava-langchainjs` and `@avadisabelle/ava-langgraphjs` ceremonial libraries currently developped in `../ava-lang*js/libs`.
+This is the nest where the `ava-langchainjs` and `ava-langgraphjs` ceremonial libraries were consolidated on 2026-09-14. They live in `./@avalangstack/` with their npm names unchanged (see `README.md`, release with `./release.sh chain|graph`). The two source repos are archived.
 
 
 Add bellow any related notes to other agent insructions files that could reside in here for the time being that we want things implemented in each of them to serve the purpose that we need.  For now, this folder would be part of the repo jgwill/workspace on path 'repos/avadisabelle/avalangstack'.  (ex.  STCKIN.md as part of the STCBots developed in jgwill/Miadi.  An example of potential implementation that is not yet created in the 2 libraries will be stored in `STCKIN.md` that will, hopefully, explain just enough of the kinship hub to get these workflows design at the rispecs level and futurely implemented by Ava's army of agents.
