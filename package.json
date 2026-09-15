@@ -4,7 +4,9 @@
   "description": "Ava's LangStack: chain primitives in chains/ and the graph engines that compose them in graphs/, for Ceremonial Technology Oriented Development",
   "packageManager": "pnpm@10.33.0",
   "scripts": {
-    "build": "pnpm -r build",
+    "build": "pnpm build:chains && pnpm build:graphs",
+    "build:chains": "pnpm --dir chains/prompt-decomposition build && pnpm --dir chains/relational-intelligence build && pnpm --dir chains/narrative-tracing build && pnpm --dir chains/inquiry-routing build && pnpm --dir chains/state-machine-spec build",
+    "build:graphs": "pnpm --dir graphs/narrative-intelligence build && pnpm --dir graphs/prompt-decomposition-engine build && pnpm --dir graphs/inquiry-routing-engine build",
     "test": "pnpm -r test",
     "check:consumption": "node scripts/check-chain-consumption.mjs",
     "release:chain": "./release.sh chain",
