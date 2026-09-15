@@ -1,7 +1,7 @@
 {
-  "name": "ava-langgraph-narrative-intelligence",
+  "name": "ava-langgraph-inquiry-routing-engine",
   "version": "0.2.1",
-  "description": "Narrative Intelligence Toolkit for LangGraph.js - Three-universe processing and NCP analysis",
+  "description": "Inquiry Routing Engine for LangGraph.js — Graph-level orchestration of PDE-to-Inquiry pipelines with Four Directions routing, relational accountability gating, and multi-channel dispatch",
   "type": "module",
   "engines": {
     "node": ">=18"
@@ -14,11 +14,6 @@
       "import": "./dist/index.js",
       "require": "./dist/index.cjs"
     },
-    "./schemas": {
-      "types": "./dist/schemas/index.d.ts",
-      "import": "./dist/schemas/index.js",
-      "require": "./dist/schemas/index.cjs"
-    },
     "./graphs": {
       "types": "./dist/graphs/index.d.ts",
       "import": "./dist/graphs/index.js",
@@ -28,11 +23,6 @@
       "types": "./dist/nodes/index.d.ts",
       "import": "./dist/nodes/index.js",
       "require": "./dist/nodes/index.cjs"
-    },
-    "./integrations": {
-      "types": "./dist/integrations/index.d.ts",
-      "import": "./dist/integrations/index.js",
-      "require": "./dist/integrations/index.cjs"
     }
   },
   "files": [
@@ -47,48 +37,56 @@
     "lint:fix": "eslint src --fix",
     "test": "vitest run",
     "test:watch": "vitest",
-    "clean": "rm -rf dist",
-    "check:dts": "node ../../scripts/check-dts.mjs .",
-    "prepublishOnly": "tsup && node ../../scripts/check-dts.mjs ."
+    "clean": "rm -rf dist"
   },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/avadisabelle/avalangstack.git",
-    "directory": "@avalangstack/narrative-intelligence"
+    "directory": "graphs/inquiry-routing-engine"
   },
   "keywords": [
     "langgraph",
-    "narrative",
-    "intelligence",
-    "three-universe",
-    "ncp",
-    "storytelling"
+    "inquiry",
+    "routing",
+    "pde",
+    "medicine-wheel",
+    "four-directions",
+    "relational",
+    "accountability",
+    "dispatch",
+    "graph"
   ],
   "author": "ava",
   "license": "MIT",
   "dependencies": {
-    "uuid": "^10.0.0"
+    "uuid": "^9.0.0"
   },
   "peerDependencies": {
-    "@langchain/langgraph": "^1.4.15",
-    "ioredis": ">=5.0.0"
+    "ava-langchain-prompt-decomposition": ">=0.1.11",
+    "ava-langchain-inquiry-routing": ">=0.1.11",
+    "@langchain/langgraph": "^1.4.15"
   },
   "peerDependenciesMeta": {
-    "@langchain/langgraph": {
-      "optional": true
+    "ava-langchain-prompt-decomposition": {
+      "optional": false
     },
-    "ioredis": {
+    "ava-langchain-inquiry-routing": {
+      "optional": false
+    },
+    "@langchain/langgraph": {
       "optional": true
     }
   },
   "devDependencies": {
+    "@langchain/core": "^1.1.48",
     "@langchain/langgraph": "^1.4.15",
     "@types/node": "^20.0.0",
     "@types/uuid": "^9.0.0",
+    "ava-langchain-prompt-decomposition": ">=0.1.11",
+    "ava-langchain-inquiry-routing": "^0.1.11",
     "eslint": "^8.0.0",
-    "ioredis": "^5.0.0",
     "tsup": "^8.0.0",
-    "typescript": "^5.0.0",
+    "typescript": "^5.3.0",
     "vitest": "^1.0.0"
   }
 }

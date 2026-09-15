@@ -12,7 +12,7 @@ importers:
         specifier: ^7.6.3
         version: 7.8.5
 
-  '@avalangstack/inquiry-routing':
+  chains/inquiry-routing:
     dependencies:
       uuid:
         specifier: ^9.0.0
@@ -23,7 +23,7 @@ importers:
         version: 9.0.8
       ava-langchain-prompt-decomposition:
         specifier: ^0.1.4
-        version: 0.1.11(ava-langchain-relational-intelligence@0.1.11)
+        version: link:../prompt-decomposition
       tsup:
         specifier: ^8.0.0
         version: 8.5.1(postcss@8.5.28)(typescript@5.9.3)
@@ -34,7 +34,140 @@ importers:
         specifier: ^1.0.0
         version: 1.6.1(@types/node@20.19.43)
 
-  '@avalangstack/inquiry-routing-engine':
+  chains/narrative-tracing:
+    dependencies:
+      ava-langchain-prompt-decomposition:
+        specifier: '>=0.1.0'
+        version: link:../prompt-decomposition
+      ava-langchain-relational-intelligence:
+        specifier: '>=0.1.0'
+        version: link:../relational-intelligence
+      uuid:
+        specifier: ^9.0.0
+        version: 9.0.1
+    devDependencies:
+      '@types/node':
+        specifier: ^20.0.0
+        version: 20.19.43
+      '@types/uuid':
+        specifier: ^9.0.0
+        version: 9.0.8
+      eslint:
+        specifier: ^8.0.0
+        version: 8.57.1
+      langfuse:
+        specifier: ^3.0.0
+        version: 3.38.20
+      tsup:
+        specifier: ^8.0.0
+        version: 8.5.1(postcss@8.5.28)(typescript@5.9.3)
+      typescript:
+        specifier: ^5.0.0
+        version: 5.9.3
+      vitest:
+        specifier: ^1.0.0
+        version: 1.6.1(@types/node@20.19.43)
+
+  chains/prompt-decomposition:
+    dependencies:
+      '@langchain/core':
+        specifier: ^1.1.48
+        version: 1.2.11
+      ava-langchain-relational-intelligence:
+        specifier: '>=0.1.0'
+        version: link:../relational-intelligence
+      uuid:
+        specifier: ^9.0.0
+        version: 9.0.1
+      zod:
+        specifier: ^3.23.0
+        version: 3.25.76
+    devDependencies:
+      '@types/node':
+        specifier: ^20.0.0
+        version: 20.19.43
+      '@types/uuid':
+        specifier: ^9.0.0
+        version: 9.0.8
+      eslint:
+        specifier: ^8.0.0
+        version: 8.57.1
+      tsup:
+        specifier: ^8.0.0
+        version: 8.5.1(postcss@8.5.28)(typescript@5.9.3)
+      typescript:
+        specifier: ^5.0.0
+        version: 5.9.3
+      vitest:
+        specifier: ^1.0.0
+        version: 1.6.1(@types/node@20.19.43)
+
+  chains/relational-intelligence:
+    dependencies:
+      '@langchain/core':
+        specifier: ^1.1.48
+        version: 1.2.11
+      ava-langchain-narrative-tracing:
+        specifier: '>=0.1.0'
+        version: link:../narrative-tracing
+      ava-langchain-prompt-decomposition:
+        specifier: '>=0.1.0'
+        version: link:../prompt-decomposition
+      uuid:
+        specifier: ^9.0.0
+        version: 9.0.1
+      zod:
+        specifier: ^3.23.0
+        version: 3.25.76
+    devDependencies:
+      '@types/node':
+        specifier: ^20.0.0
+        version: 20.19.43
+      '@types/uuid':
+        specifier: ^9.0.0
+        version: 9.0.8
+      eslint:
+        specifier: ^8.0.0
+        version: 8.57.1
+      tsup:
+        specifier: ^8.0.0
+        version: 8.5.1(postcss@8.5.28)(typescript@5.9.3)
+      typescript:
+        specifier: ^5.0.0
+        version: 5.9.3
+      vitest:
+        specifier: ^1.0.0
+        version: 1.6.1(@types/node@20.19.43)
+
+  chains/state-machine-spec:
+    dependencies:
+      ava-langchain-relational-intelligence:
+        specifier: '>=0.1.0'
+        version: link:../relational-intelligence
+      uuid:
+        specifier: ^9.0.0
+        version: 9.0.1
+    devDependencies:
+      '@types/node':
+        specifier: ^20.0.0
+        version: 20.19.43
+      '@types/uuid':
+        specifier: ^9.0.0
+        version: 9.0.8
+      eslint:
+        specifier: ^8.0.0
+        version: 8.57.1
+      tsup:
+        specifier: ^8.0.0
+        version: 8.5.1(postcss@8.5.28)(typescript@5.9.3)
+      typescript:
+        specifier: ^5.0.0
+        version: 5.9.3
+      vitest:
+        specifier: ^1.0.0
+        version: 1.6.1(@types/node@20.19.43)
+
+  graphs/inquiry-routing-engine:
     dependencies:
       uuid:
         specifier: ^9.0.0
@@ -54,10 +187,10 @@ importers:
         version: 9.0.8
       ava-langchain-inquiry-routing:
         specifier: ^0.1.11
-        version: 0.1.11(ava-langchain-prompt-decomposition@0.1.11)
+        version: link:../../chains/inquiry-routing
       ava-langchain-prompt-decomposition:
         specifier: '>=0.1.11'
-        version: 0.1.11(ava-langchain-relational-intelligence@0.1.11)
+        version: link:../../chains/prompt-decomposition
       eslint:
         specifier: ^8.0.0
         version: 8.57.1
@@ -71,7 +204,7 @@ importers:
         specifier: ^1.0.0
         version: 1.6.1(@types/node@20.19.43)
 
-  '@avalangstack/narrative-intelligence':
+  graphs/narrative-intelligence:
     dependencies:
       uuid:
         specifier: ^10.0.0
@@ -102,85 +235,17 @@ importers:
         specifier: ^1.0.0
         version: 1.6.1(@types/node@20.19.43)
 
-  '@avalangstack/narrative-tracing':
-    dependencies:
-      ava-langchain-prompt-decomposition:
-        specifier: '>=0.1.0'
-        version: 0.1.11(ava-langchain-relational-intelligence@0.1.11)
-      ava-langchain-relational-intelligence:
-        specifier: '>=0.1.0'
-        version: 0.1.11(@langchain/core@1.2.11)(ava-langchain-narrative-tracing@0.1.11)(ava-langchain-prompt-decomposition@0.1.11)
-      uuid:
-        specifier: ^9.0.0
-        version: 9.0.1
-    devDependencies:
-      '@types/node':
-        specifier: ^20.0.0
-        version: 20.19.43
-      '@types/uuid':
-        specifier: ^9.0.0
-        version: 9.0.8
-      eslint:
-        specifier: ^8.0.0
-        version: 8.57.1
-      langfuse:
-        specifier: ^3.0.0
-        version: 3.38.20
-      tsup:
-        specifier: ^8.0.0
-        version: 8.5.1(postcss@8.5.28)(typescript@5.9.3)
-      typescript:
-        specifier: ^5.0.0
-        version: 5.9.3
-      vitest:
-        specifier: ^1.0.0
-        version: 1.6.1(@types/node@20.19.43)
-
-  '@avalangstack/prompt-decomposition':
-    dependencies:
-      '@langchain/core':
-        specifier: ^1.1.48
-        version: 1.2.11
-      ava-langchain-relational-intelligence:
-        specifier: '>=0.1.0'
-        version: 0.1.11(@langchain/core@1.2.11)(ava-langchain-narrative-tracing@0.1.11)(ava-langchain-prompt-decomposition@0.1.11)
-      uuid:
-        specifier: ^9.0.0
-        version: 9.0.1
-      zod:
-        specifier: ^3.23.0
-        version: 3.25.76
-    devDependencies:
-      '@types/node':
-        specifier: ^20.0.0
-        version: 20.19.43
-      '@types/uuid':
-        specifier: ^9.0.0
-        version: 9.0.8
-      eslint:
-        specifier: ^8.0.0
-        version: 8.57.1
-      tsup:
-        specifier: ^8.0.0
-        version: 8.5.1(postcss@8.5.28)(typescript@5.9.3)
-      typescript:
-        specifier: ^5.0.0
-        version: 5.9.3
-      vitest:
-        specifier: ^1.0.0
-        version: 1.6.1(@types/node@20.19.43)
-
-  '@avalangstack/prompt-decomposition-engine':
+  graphs/prompt-decomposition-engine:
     dependencies:
       ava-langchain-prompt-decomposition:
         specifier: '>=0.1.11'
-        version: 0.1.11(ava-langchain-relational-intelligence@0.1.11)
+        version: link:../../chains/prompt-decomposition
       ava-langchain-relational-intelligence:
         specifier: '>=0.1.11'
-        version: 0.1.11(@langchain/core@1.2.11)(ava-langchain-narrative-tracing@0.1.11)(ava-langchain-prompt-decomposition@0.1.11)
+        version: link:../../chains/relational-intelligence
       ava-langgraph-narrative-intelligence:
         specifier: '>=0.1.0'
-        version: 0.2.1(@langchain/langgraph@1.4.15(@langchain/core@1.2.11)(zod@3.25.76))(ioredis@5.11.1)
+        version: link:../narrative-intelligence
       uuid:
         specifier: ^10.0.0
         version: 10.0.0
@@ -191,71 +256,6 @@ importers:
       '@langchain/langgraph':
         specifier: ^1.4.15
         version: 1.4.15(@langchain/core@1.2.11)(zod@3.25.76)
-      '@types/node':
-        specifier: ^20.0.0
-        version: 20.19.43
-      '@types/uuid':
-        specifier: ^9.0.0
-        version: 9.0.8
-      eslint:
-        specifier: ^8.0.0
-        version: 8.57.1
-      tsup:
-        specifier: ^8.0.0
-        version: 8.5.1(postcss@8.5.28)(typescript@5.9.3)
-      typescript:
-        specifier: ^5.0.0
-        version: 5.9.3
-      vitest:
-        specifier: ^1.0.0
-        version: 1.6.1(@types/node@20.19.43)
-
-  '@avalangstack/relational-intelligence':
-    dependencies:
-      '@langchain/core':
-        specifier: ^1.1.48
-        version: 1.2.11
-      ava-langchain-narrative-tracing:
-        specifier: '>=0.1.0'
-        version: 0.1.11(ava-langchain-prompt-decomposition@0.1.11)(ava-langchain-relational-intelligence@0.1.11)(langfuse@3.38.20)
-      ava-langchain-prompt-decomposition:
-        specifier: '>=0.1.0'
-        version: 0.1.11(ava-langchain-relational-intelligence@0.1.11)
-      uuid:
-        specifier: ^9.0.0
-        version: 9.0.1
-      zod:
-        specifier: ^3.23.0
-        version: 3.25.76
-    devDependencies:
-      '@types/node':
-        specifier: ^20.0.0
-        version: 20.19.43
-      '@types/uuid':
-        specifier: ^9.0.0
-        version: 9.0.8
-      eslint:
-        specifier: ^8.0.0
-        version: 8.57.1
-      tsup:
-        specifier: ^8.0.0
-        version: 8.5.1(postcss@8.5.28)(typescript@5.9.3)
-      typescript:
-        specifier: ^5.0.0
-        version: 5.9.3
-      vitest:
-        specifier: ^1.0.0
-        version: 1.6.1(@types/node@20.19.43)
-
-  '@avalangstack/state-machine-spec':
-    dependencies:
-      ava-langchain-relational-intelligence:
-        specifier: '>=0.1.0'
-        version: 0.1.11(@langchain/core@1.2.11)(ava-langchain-narrative-tracing@0.1.11)(ava-langchain-prompt-decomposition@0.1.11)
-      uuid:
-        specifier: ^9.0.0
-        version: 9.0.1
-    devDependencies:
       '@types/node':
         specifier: ^20.0.0
         version: 20.19.43
@@ -887,59 +887,6 @@ packages:
 
   assertion-error@1.1.0:
     resolution: {integrity: sha512-jgsaNduz+ndvGyFt3uSuWqvy4lCnIJiovtouQN5JZHOKCS2QuhEdbcQHFhVksz2N2U9hXJo8odG7ETyWlEeuDw==}
-
-  ava-langchain-inquiry-routing@0.1.11:
-    resolution: {integrity: sha512-9eaDBjZghsO4c1NUKl5iYRpIP5xev3LjQjSh153oizoaGQh5+zgj9neqNwuup9tGr6K2cYPnTb1/o5JnInQTgw==}
-    engines: {node: '>=18'}
-    peerDependencies:
-      ava-langchain-prompt-decomposition: '>=0.1.0'
-
-  ava-langchain-narrative-tracing@0.1.11:
-    resolution: {integrity: sha512-UmOcfr4Tb9Oiy78PqoS8sIcr29mbJ/Fpw62O/OCSaEB+PkNyG3JFq5SslVFBvOXNYiGlGxNRUM8klOjhe7eyuw==}
-    engines: {node: '>=18'}
-    peerDependencies:
-      ava-langchain-prompt-decomposition: '>=0.1.0'
-      ava-langchain-relational-intelligence: '>=0.1.0'
-      langfuse: '>=3.0.0'
-    peerDependenciesMeta:
-      ava-langchain-prompt-decomposition:
-        optional: true
-      ava-langchain-relational-intelligence:
-        optional: true
-      langfuse:
-        optional: true
-
-  ava-langchain-prompt-decomposition@0.1.11:
-    resolution: {integrity: sha512-x61f+aMkveLCEvFkgYurl/81Xe+aQW4yE5P7sDXeO3j5H1E/OjO62JwyrJaKOsc10y/AV+tbVVXqY13x0Nlj+g==}
-    engines: {node: '>=20'}
-    peerDependencies:
-      ava-langchain-relational-intelligence: '>=0.1.0'
-    peerDependenciesMeta:
-      ava-langchain-relational-intelligence:
-        optional: true
-
-  ava-langchain-relational-intelligence@0.1.11:
-    resolution: {integrity: sha512-EQX71zKwpGnfw96nAvPKudx/ZHQ28Q2t58D0GGjnwP12zkfNHfBF7Q4/XdeGqY1KC69ZkajQ8tck16Cjx/cmQw==}
-    engines: {node: '>=18'}
-    peerDependencies:
-      '@langchain/core': ^1.1.48
-      ava-langchain-narrative-tracing: '>=0.1.0'
-      ava-langchain-prompt-decomposition: '>=0.1.0'
-    peerDependenciesMeta:
-      ava-langchain-narrative-tracing:
-        optional: true
-
-  ava-langgraph-narrative-intelligence@0.2.1:
-    resolution: {integrity: sha512-+lygGjrLoq5MFsn56+gZzTzYXlMRt2P+WJL+QkuF6HALpFMdH6g2OMOG/tVoFyui1SVgpo4SgPCAofFvmh8RIQ==}
-    engines: {node: '>=18'}
-    peerDependencies:
-      '@langchain/langgraph': ^1.4.15
-      ioredis: '>=5.0.0'
-    peerDependenciesMeta:
-      '@langchain/langgraph':
-        optional: true
-      ioredis:
-        optional: true
 
   balanced-match@1.0.2:
     resolution: {integrity: sha512-3oSeUO0TMV67hN1AmbXsK4yaqU7tjiHlbxRDZOpH0KW9+CeX4bRAaX0Anxt0tx2MrpRpWwQaPwIlISEJhYU5Pw==}
@@ -2165,49 +2112,6 @@ snapshots:
   argparse@2.0.1: {}
 
   assertion-error@1.1.0: {}
-
-  ava-langchain-inquiry-routing@0.1.11(ava-langchain-prompt-decomposition@0.1.11):
-    dependencies:
-      ava-langchain-prompt-decomposition: 0.1.11(ava-langchain-relational-intelligence@0.1.11)
-      uuid: 9.0.1
-
-  ava-langchain-narrative-tracing@0.1.11(ava-langchain-prompt-decomposition@0.1.11)(ava-langchain-relational-intelligence@0.1.11)(langfuse@3.38.20):
-    dependencies:
-      uuid: 9.0.1
-    optionalDependencies:
-      ava-langchain-prompt-decomposition: 0.1.11(ava-langchain-relational-intelligence@0.1.11)
-      ava-langchain-relational-intelligence: 0.1.11(@langchain/core@1.2.11)(ava-langchain-narrative-tracing@0.1.11)(ava-langchain-prompt-decomposition@0.1.11)
-      langfuse: 3.38.20
-
-  ava-langchain-prompt-decomposition@0.1.11(ava-langchain-relational-intelligence@0.1.11):
-    dependencies:
-      '@langchain/core': 1.2.11
-      uuid: 9.0.1
-      zod: 3.25.76
-    optionalDependencies:
-      ava-langchain-relational-intelligence: 0.1.11(@langchain/core@1.2.11)(ava-langchain-narrative-tracing@0.1.11)(ava-langchain-prompt-decomposition@0.1.11)
-    transitivePeerDependencies:
-      - '@opentelemetry/api'
-      - '@opentelemetry/exporter-trace-otlp-proto'
-      - '@opentelemetry/sdk-trace-base'
-      - openai
-      - ws
-
-  ava-langchain-relational-intelligence@0.1.11(@langchain/core@1.2.11)(ava-langchain-narrative-tracing@0.1.11)(ava-langchain-prompt-decomposition@0.1.11):
-    dependencies:
-      '@langchain/core': 1.2.11
-      ava-langchain-prompt-decomposition: 0.1.11(ava-langchain-relational-intelligence@0.1.11)
-      uuid: 9.0.1
-      zod: 3.25.76
-    optionalDependencies:
-      ava-langchain-narrative-tracing: 0.1.11(ava-langchain-prompt-decomposition@0.1.11)(ava-langchain-relational-intelligence@0.1.11)(langfuse@3.38.20)
-
-  ava-langgraph-narrative-intelligence@0.2.1(@langchain/langgraph@1.4.15(@langchain/core@1.2.11)(zod@3.25.76))(ioredis@5.11.1):
-    dependencies:
-      uuid: 10.0.0
-    optionalDependencies:
-      '@langchain/langgraph': 1.4.15(@langchain/core@1.2.11)(zod@3.25.76)
-      ioredis: 5.11.1
 
   balanced-match@1.0.2: {}
 

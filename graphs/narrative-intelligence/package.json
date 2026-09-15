@@ -1,7 +1,7 @@
 {
-  "name": "ava-langgraph-prompt-decomposition-engine",
+  "name": "ava-langgraph-narrative-intelligence",
   "version": "0.2.1",
-  "description": "Prompt Decomposition Engine for LangGraph.js - Graph-level orchestration of Four Directions analysis, three-universe perspective processing, and ceremony gating",
+  "description": "Narrative Intelligence Toolkit for LangGraph.js - Three-universe processing and NCP analysis",
   "type": "module",
   "engines": {
     "node": ">=18"
@@ -14,6 +14,11 @@
       "import": "./dist/index.js",
       "require": "./dist/index.cjs"
     },
+    "./schemas": {
+      "types": "./dist/schemas/index.d.ts",
+      "import": "./dist/schemas/index.js",
+      "require": "./dist/schemas/index.cjs"
+    },
     "./graphs": {
       "types": "./dist/graphs/index.d.ts",
       "import": "./dist/graphs/index.js",
@@ -23,6 +28,11 @@
       "types": "./dist/nodes/index.d.ts",
       "import": "./dist/nodes/index.js",
       "require": "./dist/nodes/index.cjs"
+    },
+    "./integrations": {
+      "types": "./dist/integrations/index.d.ts",
+      "import": "./dist/integrations/index.js",
+      "require": "./dist/integrations/index.cjs"
     }
   },
   "files": [
@@ -37,52 +47,46 @@
     "lint:fix": "eslint src --fix",
     "test": "vitest run",
     "test:watch": "vitest",
-    "clean": "rm -rf dist"
+    "clean": "rm -rf dist",
+    "check:dts": "node ../../scripts/check-dts.mjs .",
+    "prepublishOnly": "tsup && node ../../scripts/check-dts.mjs ."
   },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/avadisabelle/avalangstack.git",
-    "directory": "@avalangstack/prompt-decomposition-engine"
+    "directory": "graphs/narrative-intelligence"
   },
   "keywords": [
     "langgraph",
-    "prompt",
-    "decomposition",
-    "pde",
-    "medicine-wheel",
-    "four-directions",
+    "narrative",
+    "intelligence",
     "three-universe",
-    "ceremony",
-    "graph"
+    "ncp",
+    "storytelling"
   ],
   "author": "ava",
   "license": "MIT",
   "dependencies": {
-    "ava-langchain-prompt-decomposition": ">=0.1.11",
     "uuid": "^10.0.0"
   },
   "peerDependencies": {
-    "ava-langchain-relational-intelligence": ">=0.1.11",
-    "ava-langgraph-narrative-intelligence": ">=0.1.0",
-    "@langchain/langgraph": "^1.4.15"
+    "@langchain/langgraph": "^1.4.15",
+    "ioredis": ">=5.0.0"
   },
   "peerDependenciesMeta": {
-    "ava-langgraph-narrative-intelligence": {
-      "optional": true
-    },
-    "ava-langchain-relational-intelligence": {
-      "optional": true
-    },
     "@langchain/langgraph": {
+      "optional": true
+    },
+    "ioredis": {
       "optional": true
     }
   },
   "devDependencies": {
-    "@langchain/core": "^1.1.48",
     "@langchain/langgraph": "^1.4.15",
     "@types/node": "^20.0.0",
     "@types/uuid": "^9.0.0",
     "eslint": "^8.0.0",
+    "ioredis": "^5.0.0",
     "tsup": "^8.0.0",
     "typescript": "^5.0.0",
     "vitest": "^1.0.0"

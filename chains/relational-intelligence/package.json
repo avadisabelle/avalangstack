@@ -1,7 +1,7 @@
 {
-  "name": "ava-langchain-state-machine-spec",
+  "name": "ava-langchain-relational-intelligence",
   "version": "0.1.11",
-  "description": "State Machine Specification layer for LangGraph - declarative workflow specs with formal validation, relational accountability, and Mermaid visualization",
+  "description": "Relational Intelligence for the Narrative Intelligence Stack - Medicine Wheel ontology, importance units, epistemic iteration, value gates, and Fire Keeper coordination grounded in Indigenous relational paradigms",
   "type": "module",
   "engines": {
     "node": ">=18"
@@ -32,30 +32,38 @@
   "repository": {
     "type": "git",
     "url": "git+https://github.com/avadisabelle/avalangstack.git",
-    "directory": "@avalangstack/state-machine-spec"
+    "directory": "chains/relational-intelligence"
   },
   "keywords": [
     "langchain",
-    "langgraph",
-    "state-machine",
-    "specification",
-    "workflow",
-    "validation",
-    "mermaid",
-    "relational-accountability",
-    "formal-verification"
+    "relational",
+    "intelligence",
+    "medicine-wheel",
+    "indigenous",
+    "ontology",
+    "importance",
+    "epistemic",
+    "ceremony",
+    "fire-keeper"
   ],
   "author": "ava",
   "license": "MIT",
   "dependencies": {
-    "uuid": "^9.0.0"
+    "@langchain/core": "^1.1.48",
+    "uuid": "^9.0.0",
+    "zod": "^3.23.0"
   },
   "peerDependencies": {
-    "ava-langchain-relational-intelligence": ">=0.1.0"
+    "@langchain/core": "^1.1.48",
+    "ava-langchain-narrative-tracing": ">=0.1.0",
+    "ava-langchain-prompt-decomposition": ">=0.1.0"
   },
   "peerDependenciesMeta": {
-    "ava-langchain-relational-intelligence": {
+    "ava-langchain-narrative-tracing": {
       "optional": true
+    },
+    "ava-langchain-prompt-decomposition": {
+      "optional": false
     }
   },
   "devDependencies": {

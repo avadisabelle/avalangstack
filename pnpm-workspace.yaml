@@ -1,5 +1,11 @@
 packages:
-  - "@avalangstack/*"
+  - "chains/*"
+  - "graphs/*"
+
+# Graphs consume the chains in this repo, not copies from npm: every ava-langchain-*
+# range the local chain satisfies is linked from chains/.
+# scripts/check-chain-consumption.mjs fails if a graph resolves a chain from anywhere else.
+linkWorkspacePackages: true
 
 onlyBuiltDependencies:
   - esbuild

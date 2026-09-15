@@ -1,7 +1,7 @@
 {
-  "name": "ava-langgraph-inquiry-routing-engine",
+  "name": "ava-langgraph-prompt-decomposition-engine",
   "version": "0.2.1",
-  "description": "Inquiry Routing Engine for LangGraph.js — Graph-level orchestration of PDE-to-Inquiry pipelines with Four Directions routing, relational accountability gating, and multi-channel dispatch",
+  "description": "Prompt Decomposition Engine for LangGraph.js - Graph-level orchestration of Four Directions analysis, three-universe perspective processing, and ceremony gating",
   "type": "module",
   "engines": {
     "node": ">=18"
@@ -42,36 +42,36 @@
   "repository": {
     "type": "git",
     "url": "git+https://github.com/avadisabelle/avalangstack.git",
-    "directory": "@avalangstack/inquiry-routing-engine"
+    "directory": "graphs/prompt-decomposition-engine"
   },
   "keywords": [
     "langgraph",
-    "inquiry",
-    "routing",
+    "prompt",
+    "decomposition",
     "pde",
     "medicine-wheel",
     "four-directions",
-    "relational",
-    "accountability",
-    "dispatch",
+    "three-universe",
+    "ceremony",
     "graph"
   ],
   "author": "ava",
   "license": "MIT",
   "dependencies": {
-    "uuid": "^9.0.0"
+    "ava-langchain-prompt-decomposition": ">=0.1.11",
+    "uuid": "^10.0.0"
   },
   "peerDependencies": {
-    "ava-langchain-prompt-decomposition": ">=0.1.11",
-    "ava-langchain-inquiry-routing": ">=0.1.11",
+    "ava-langchain-relational-intelligence": ">=0.1.11",
+    "ava-langgraph-narrative-intelligence": ">=0.1.0",
     "@langchain/langgraph": "^1.4.15"
   },
   "peerDependenciesMeta": {
-    "ava-langchain-prompt-decomposition": {
-      "optional": false
+    "ava-langgraph-narrative-intelligence": {
+      "optional": true
     },
-    "ava-langchain-inquiry-routing": {
-      "optional": false
+    "ava-langchain-relational-intelligence": {
+      "optional": true
     },
     "@langchain/langgraph": {
       "optional": true
@@ -82,11 +82,9 @@
     "@langchain/langgraph": "^1.4.15",
     "@types/node": "^20.0.0",
     "@types/uuid": "^9.0.0",
-    "ava-langchain-prompt-decomposition": ">=0.1.11",
-    "ava-langchain-inquiry-routing": "^0.1.11",
     "eslint": "^8.0.0",
     "tsup": "^8.0.0",
-    "typescript": "^5.3.0",
+    "typescript": "^5.0.0",
     "vitest": "^1.0.0"
   }
 }

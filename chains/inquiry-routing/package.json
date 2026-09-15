@@ -45,6 +45,6 @@
   "repository": {
     "type": "git",
     "url": "git+https://github.com/avadisabelle/avalangstack.git",
-    "directory": "@avalangstack/inquiry-routing"
+    "directory": "chains/inquiry-routing"
   }
 }

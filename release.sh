@@ -3,15 +3,19 @@
 #
 # Usage: ./release.sh <chain|graph> [patch|minor|major]   # bump defaults to patch
 #
-#   chain  the five ava-langchain-* packages, one version line (0.1.x)
-#   graph  the three ava-langgraph-* packages, one version line (0.2.x)
+#   chain  chains/*  the five ava-langchain-* packages, one version line (0.1.x)
+#   graph  graphs/*  the three ava-langgraph-* packages, one version line (0.2.x)
 #
 # DRY_RUN=1   Build, test, and validate packages without changing or publishing.
 # SKIP_BUMP=1 Resume a failed release using the versions already declared.
 #
-# The npm names did not change when the folders moved into @avalangstack/.
-# They came from avadisabelle/ava-langchainjs and avadisabelle/ava-langgraphjs,
-# whose release.sh scripts this one merges.
+# Graphs are built and tested against the chains in this repo. A graph release
+# builds chains/ first and stops if any graph resolves a chain from npm instead
+# (scripts/check-chain-consumption.mjs).
+#
+# The npm names did not change when the folders moved here from
+# avadisabelle/ava-langchainjs and avadisabelle/ava-langgraphjs, whose release.sh
+# scripts this one merges.
 
 set -euo pipefail
 
@@ -24,27 +28,26 @@ DRY_RUN="${DRY_RUN:-0}"
 SKIP_BUMP="${SKIP_BUMP:-0}"
 STEP=0
 
+CHAINS=(
+  chains/prompt-decomposition
+  chains/relational-intelligence
+  chains/narrative-tracing
+  chains/inquiry-routing
+  chains/state-machine-spec
+)
+GRAPHS=(
+  graphs/narrative-intelligence
+  graphs/prompt-decomposition-engine
+  graphs/inquiry-routing-engine
+)
+
 step() { STEP=$((STEP + 1)); printf '\n[%d] %s\n' "$STEP" "$1"; }
 die() { printf '\nError: %s\n' "$1" >&2; exit 1; }
 trap 'printf "\nRelease failed at step %s. Fix it and resume with SKIP_BUMP=1 ./release.sh %s.\n" "$STEP" "$FAMILY" >&2' ERR
 
 case "$FAMILY" in
-  chain)
-    PACKAGES=(
-      @avalangstack/prompt-decomposition
-      @avalangstack/relational-intelligence
-      @avalangstack/narrative-tracing
-      @avalangstack/inquiry-routing
-      @avalangstack/state-machine-spec
-    )
-    ;;
-  graph)
-    PACKAGES=(
-      @avalangstack/narrative-intelligence
-      @avalangstack/prompt-decomposition-engine
-      @avalangstack/inquiry-routing-engine
-    )
-    ;;
+  chain) PACKAGES=("${CHAINS[@]}") ;;
+  graph) PACKAGES=("${GRAPHS[@]}") ;;
   *) die "family must be chain or graph (got: ${FAMILY:-nothing})" ;;
 esac
 
@@ -98,7 +101,7 @@ NODE
   fi
 fi
 
-# Chain packages build against each other, not older copies installed from npm.
+# Chains build against each other, not older copies installed from npm.
 link_local() {
   local consumer="$1" name="$2" target="$3"
   local link="$consumer/node_modules/$name"
@@ -106,18 +109,32 @@ link_local() {
   ln -sfn "$ROOT/$target" "$link"
 }
 
-step "Build all $FAMILY packages"
-if [[ "$FAMILY" == "chain" ]]; then
-  link_local @avalangstack/relational-intelligence ava-langchain-prompt-decomposition @avalangstack/prompt-decomposition
-  link_local @avalangstack/narrative-tracing ava-langchain-prompt-decomposition @avalangstack/prompt-decomposition
-  link_local @avalangstack/narrative-tracing ava-langchain-relational-intelligence @avalangstack/relational-intelligence
-  link_local @avalangstack/inquiry-routing ava-langchain-prompt-decomposition @avalangstack/prompt-decomposition
+link_chains() {
+  link_local chains/relational-intelligence ava-langchain-prompt-decomposition chains/prompt-decomposition
+  link_local chains/narrative-tracing ava-langchain-prompt-decomposition chains/prompt-decomposition
+  link_local chains/narrative-tracing ava-langchain-relational-intelligence chains/relational-intelligence
+  link_local chains/inquiry-routing ava-langchain-prompt-decomposition chains/prompt-decomposition
+}
+
+build_dirs() {
+  for dir in "$@"; do
+    rm -rf "$dir/dist"
+    pnpm --dir "$dir" build
+  done
+}
+
+if [[ "$FAMILY" == "graph" ]]; then
+  step "Build the chains these graphs consume"
+  link_chains
+  build_dirs "${CHAINS[@]}"
+
+  step "Check graphs consume chains/"
+  node scripts/check-chain-consumption.mjs
 fi
 
-for dir in "${PACKAGES[@]}"; do
-  rm -rf "$dir/dist"
-  pnpm --dir "$dir" build
-done
+step "Build all $FAMILY packages"
+[[ "$FAMILY" == "chain" ]] && link_chains
+build_dirs "${PACKAGES[@]}"
 
 step "Test all $FAMILY packages"
 for dir in "${PACKAGES[@]}"; do

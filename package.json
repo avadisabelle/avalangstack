@@ -1,11 +1,12 @@
 {
   "name": "@avadisabelle/avalangstack",
   "private": true,
-  "description": "Ava's LangStack: chain primitives and graph engines for Ceremonial Technology Oriented Development, gathered under @avalangstack/",
+  "description": "Ava's LangStack: chain primitives in chains/ and the graph engines that compose them in graphs/, for Ceremonial Technology Oriented Development",
   "packageManager": "pnpm@10.33.0",
   "scripts": {
     "build": "pnpm -r build",
     "test": "pnpm -r test",
+    "check:consumption": "node scripts/check-chain-consumption.mjs",
     "release:chain": "./release.sh chain",
     "release:graph": "./release.sh graph"
   },

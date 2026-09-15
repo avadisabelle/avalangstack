@@ -1,10 +1,10 @@
 {
-  "name": "ava-langchain-relational-intelligence",
+  "name": "ava-langchain-prompt-decomposition",
   "version": "0.1.11",
-  "description": "Relational Intelligence for the Narrative Intelligence Stack - Medicine Wheel ontology, importance units, epistemic iteration, value gates, and Fire Keeper coordination grounded in Indigenous relational paradigms",
+  "description": "Prompt Decomposition Engine primitives for the Narrative Intelligence Stack - Four Directions analysis, intent extraction, dependency mapping, and action stacking grounded in Medicine Wheel epistemology",
   "type": "module",
   "engines": {
-    "node": ">=18"
+    "node": ">=20"
   },
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
@@ -32,19 +32,19 @@
   "repository": {
     "type": "git",
     "url": "git+https://github.com/avadisabelle/avalangstack.git",
-    "directory": "@avalangstack/relational-intelligence"
+    "directory": "chains/prompt-decomposition"
   },
   "keywords": [
     "langchain",
-    "relational",
-    "intelligence",
+    "prompt",
+    "decomposition",
+    "pde",
     "medicine-wheel",
+    "four-directions",
     "indigenous",
-    "ontology",
-    "importance",
-    "epistemic",
-    "ceremony",
-    "fire-keeper"
+    "intent",
+    "dependency",
+    "action-stack"
   ],
   "author": "ava",
   "license": "MIT",
@@ -54,16 +54,11 @@
     "zod": "^3.23.0"
   },
   "peerDependencies": {
-    "@langchain/core": "^1.1.48",
-    "ava-langchain-narrative-tracing": ">=0.1.0",
-    "ava-langchain-prompt-decomposition": ">=0.1.0"
+    "ava-langchain-relational-intelligence": ">=0.1.0"
   },
   "peerDependenciesMeta": {
-    "ava-langchain-narrative-tracing": {
+    "ava-langchain-relational-intelligence": {
       "optional": true
-    },
-    "ava-langchain-prompt-decomposition": {
-      "optional": false
     }
   },
   "devDependencies": {
