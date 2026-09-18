@@ -1,0 +1,1712 @@
+# AvaLangStack
+
+Chain primitives and the graph engines that compose them, for Ceremonial Technology Oriented Development.
+Source: https://github.com/avadisabelle/avalangstack — docs: https://avalangstack.sanctuaireagentique.com
+
+---
+
+# ava-langchain-prompt-decomposition (0.1.11)
+
+Folder: chains/prompt-decomposition
+
+# ava-langchain-prompt-decomposition
+
+Prompt Decomposition Engine (PDE) primitives for the Narrative Intelligence Stack.
+
+Decomposes complex prompts through **Four Directions** analysis (Medicine Wheel epistemology):
+- **EAST (Vision/Spiritual)**: What is being asked? → Intent extraction
+- **SOUTH (Analysis/Mental)**: What needs to be learned? → Dependency mapping
+- **WEST (Validation/Emotional)**: What needs reflection? → Ceremony checks
+- **NORTH (Action/Physical)**: What executes? → Ordered action stack
+
+## Installation
+
+```bash
+pnpm add ava-langchain-prompt-decomposition
+```
+
+## Quick Start
+
+```typescript
+import { decompose } from 'ava-langchain-prompt-decomposition';
+
+const result = decompose(
+  'Research the existing patterns. Build the new module. Test the integration.'
+);
+
+console.log(result.json);     // Full PDE JSON
+console.log(result.markdown); // Human-readable breakdown
+```
+
+## Core Modules
+
+| Module | Description |
+|--------|-------------|
+| `DirectionalDecomposer` | Classifies prompt segments into EAST/SOUTH/WEST/NORTH |
+| `IntentExtractor` | Extracts primary + secondary intents with confidence and urgency |
+| `DependencyMapper` | Builds dependency graphs with cycle detection and execution ordering |
+| `ActionStackBuilder` | Produces final PDE output (JSON/Markdown) |
+| `MedicineWheelBridge` | Direction↔Quadrant mapping, ceremony detection |
+| `V0OntologyBridge` | Maps to @medicine-wheel/* V0 package vision |
+
+## API
+
+### `decompose(prompt, options?)`
+
+Convenience pipeline that runs all modules in sequence.
+
+```typescript
+const result = decompose('Build a knowledge graph with ceremony.', {
+  extractImplicit: true,
+  maxItems: 20,
+  ceremonyThreshold: 0.3,
+});
+
+result.decomposition  // DecompositionResult
+result.wheelEnriched  // WheelEnrichedAnalysis
+result.json           // JSON string
+result.markdown       // Markdown string
+```
+
+### `DirectionalDecomposer`
+
+```typescript
+const decomposer = new DirectionalDecomposer();
+const analysis = decomposer.decompose('Research and build.');
+
+analysis.directions      // { east: [...], south: [...], west: [...], north: [...] }
+analysis.leadDirection   // Direction.NORTH
+analysis.balance         // 0.0 - 1.0
+decomposer.isBalanced(analysis)       // boolean
+decomposer.getGuidance(analysis)      // string[]
+```
+
+### `IntentExtractor`
+
+```typescript
+const extractor = new IntentExtractor({ extractImplicit: true });
+const result = extractor.extract('Create a module and test it.');
+
+result.primary     // { action: 'create', confidence: 0.9, urgency: 'session' }
+result.secondary   // ActionIntent[]
+result.context     // { filesNeeded: [...] }
+```
+
+## Related Packages
+
+- `ava-langchain-relational-intelligence` — MedicineWheelFilter, ValueGate, SpiralTracker
+- `ava-langgraph-prompt-decomposition-engine` — Graph-level orchestration (depends on this package)
+- `ava-langchain-narrative-tracing` — Narrative tracing handlers
+
+---
+
+# ava-langchain-relational-intelligence (0.1.11)
+
+Folder: chains/relational-intelligence
+
+# Relational Intelligence for LangChain.js
+
+Relational Intelligence components for the Narrative Intelligence Stack, grounded in Indigenous relational paradigms.
+
+## Overview
+
+This package provides foundational components that foreground relational accountability and Indigenous ways of knowing:
+
+- **Medicine Wheel Filter** - Ontological filter using four quadrants (Physical, Emotional, Mental, Spiritual)
+- **Importance Units** - Relational importance with accountability scoring and Relational Strings (Land, Dream, Code, Vision)
+- **Epistemic Iteration** - Spiral tracker that recognizes circling as ceremony, not redundancy
+- **Value Gate** - Research Is Ceremony and Medicine Wheel gating conditions for autonomous action
+- **Fire Keeper** - Coordinating agent protocol for vision alignment, not task management
+- **Liminal Buffer** - High-context buffer for dream-state and liminal inputs
+
+## Installation
+
+```bash
+npm install ava-langchain-relational-intelligence
+```
+
+## Quick Start
+
+### Medicine Wheel Filter
+
+The wheel asks "To what is this accountable?" not "What is this about?"
+
+```typescript
+import { MedicineWheelFilter, MedicineWheelQuadrant } from "ava-langchain-relational-intelligence";
+
+const wheel = new MedicineWheelFilter();
+
+// Assess an input across all four quadrants
+const assessment = wheel.assess("input_1", "Add database schema for user auth");
+console.log(assessment.leadQuadrant); // "mental"
+console.log(assessment.neglectedQuadrants); // ["emotional", "spiritual"]
+console.log(assessment.relationalCoverage); // 0.5
+
+// Get guidance for what's missing
+const guided = wheel.assessWithGuidance("input_2", "Build the server infrastructure");
+for (const g of guided.guidance) {
+  console.log(g);
+  // "The Spiritual quadrant is neglected. Consider: does this align with the deeper vision?"
+}
+
+// Check if agent can proceed autonomously
+if (!wheel.canProceedAutonomously(assessment)) {
+  console.log("Bring human into the loop - spiritual/emotional quadrants neglected");
+}
+```
+
+### Importance Units with Relational Strings
+
+Every piece of data is connected back to four relational sources: The Land, The Dream, The Code, The Vision.
+
+```typescript
+import {
+  createImportanceUnit,
+  ImportanceContext,
+  connectToSource,
+  RelationalSource,
+  deepenUnit,
+  ImportanceStore,
+} from "ava-langchain-relational-intelligence";
+
+// Create a unit from a liminal insight (1.5x accountability weight)
+const unit = createImportanceUnit(
+  "The knowledge graph should be alive, not flat",
+  "session_123",
+  ImportanceContext.LIMINAL
+);
+
+// Connect to relational sources
+connectToSource(unit, RelationalSource.DREAM, 0.9, "Hypnagogic insight");
+connectToSource(unit, RelationalSource.VISION, 0.8, "Core architectural direction");
+
+// Deepen through revisitation (circling strengthens, not replaces)
+deepenUnit(unit, "The wheel should be the ontological filter");
+deepenUnit(unit, "Each quadrant is a flavor of relationship", ImportanceContext.CEREMONIAL);
+
+// Store and query
+const store = new ImportanceStore();
+store.add(unit);
+
+const mostAccountable = store.getByAccountability(10);
+const needingAttention = store.getNeedingAttention(5);
+```
+
+### Epistemic Iteration (Spiral Tracker)
+
+Repetition is ceremony. Each circle back deepens the relationship.
+
+```typescript
+import { SpiralTracker, SpiralShiftType } from "ava-langchain-relational-intelligence";
+
+const tracker = new SpiralTracker();
+
+// First mention of knowledge graph
+tracker.recordCircle("kg", "Knowledge Graph", "We need a knowledge graph", "session_1");
+
+// Second return - adding new territory
+tracker.recordCircle("kg", "Knowledge Graph",
+  "The graph should use Medicine Wheel as ontological filter", "session_1");
+
+// Third return - deepening
+tracker.recordCircle("kg", "Knowledge Graph",
+  "Each quadrant represents a relational dimension, not a category", "session_2");
+
+// Check depth
+const spiral = tracker.getSpiral("kg");
+console.log(spiral.depth); // 3
+
+// Analyze shifts - the important lines live between iterations
+const shifts = tracker.analyzeShifts("kg");
+console.log(shifts[2].shiftType); // "expanding" or "deepening"
+console.log(shifts[2].significance); // Higher with depth
+
+// Get deepest spirals (most important topics)
+const deepest = tracker.getByDepth(5);
+```
+
+### Value Gate
+
+Research Is Ceremony is a required context, not an optional citation.
+
+```typescript
+import { ValueGate } from "ava-langchain-relational-intelligence";
+
+const gate = new ValueGate();
+
+// Technical work passes through
+const techVerdict = gate.evaluate({
+  action: "Add REST API endpoint",
+  actionDescription: "Simple CRUD endpoint",
+  agentId: "agent_1",
+  sessionId: "s1",
+  metadata: {},
+});
+console.log(techVerdict.canProceed); // true
+
+// Indigenous knowledge work requires ceremony context
+const indigenousVerdict = gate.evaluate({
+  action: "Design Indigenous ontology",
+  actionDescription: "Create schema for medicine wheel relational models",
+  agentId: "agent_1",
+  sessionId: "s1",
+  metadata: { researchIsCeremonyGathered: false },
+});
+console.log(indigenousVerdict.canProceed); // false
+console.log(indigenousVerdict.requiresHuman); // true
+console.log(indigenousVerdict.failureSummary);
+// ["[Research Is Ceremony]: context has not been gathered"]
+
+// After gathering ceremony context
+const afterVerdict = gate.evaluate({
+  action: "Design Indigenous ontology",
+  actionDescription: "Create schema for medicine wheel relational models",
+  agentId: "agent_1",
+  sessionId: "s1",
+  metadata: { researchIsCeremonyGathered: true },
+});
+console.log(afterVerdict.canProceed); // true
+```
+
+### Fire Keeper (Coordinating Agent)
+
+The Fire Keeper's primary job is Vision Alignment, not Task Management.
+
+```typescript
+import {
+  FireKeeper,
+  createAgentReport,
+  EngagementMode,
+} from "ava-langchain-relational-intelligence";
+
+const keeper = new FireKeeper(
+  "Build a relational intelligence system grounded in Indigenous paradigms"
+);
+
+// Receive a report from a sub-agent
+const report = createAgentReport(
+  "agent_1",
+  "Mia",
+  "Built database schema",
+  "Schema created successfully",
+  { confidence: 0.3 } // Low confidence
+);
+
+const review = keeper.reviewReport(report);
+if (review.requiresHumanEngagement) {
+  console.log(review.engagementRequest.mode); // "code_review"
+  console.log(review.engagementRequest.reason); // "Low agent confidence"
+}
+
+// Gate actions through value constraints
+const verdict = keeper.gateAction({
+  action: "Deploy ontology to production",
+  actionDescription: "Pushes Indigenous ontology schema live",
+  agentId: "agent_2",
+  sessionId: "session_1",
+  metadata: { researchIsCeremonyGathered: true },
+});
+
+// Record relational milestones (not time-based)
+keeper.recordMilestone(
+  "Completed knowledge graph design with relational care",
+  ["knowledge_graph"],
+  ["unit_1", "unit_2"]
+);
+
+// Pruning is allowed after relational circles complete, not after time
+if (keeper.canPrune()) {
+  console.log("Relational circle complete - pruning allowed");
+}
+
+// Get system summary
+console.log(keeper.getSummary());
+```
+
+### Liminal Buffer
+
+Dream-state inputs are root context. Technical work is pruned relative to this, not the other way around.
+
+```typescript
+import { LiminalBuffer, LiminalMode } from "ava-langchain-relational-intelligence";
+
+const buffer = new LiminalBuffer();
+
+// Capture a half-awake recording (1.5x weight)
+const input = buffer.capture(
+  "The system needs to breathe... the knowledge graph should be alive, not flat...",
+  LiminalMode.HYPNAGOGIC,
+  "session_1",
+  { sourceFile: "recording_2am.m4a" }
+);
+
+console.log(input.weight); // 1.5 (higher than analytical inputs)
+console.log(input.importanceUnits.length); // 1 (auto-created)
+
+// Check if technical work aligns with liminal context
+const alignment = buffer.checkAlignment("Add flat JSON schema for knowledge graph");
+if (!alignment.aligned) {
+  for (const conflict of alignment.conflicts) {
+    console.log(conflict);
+    // "Liminal context emphasizes spiritual but proposed action neglects it"
+  }
+}
+
+// Root context informs all other pruning
+const rootContext = buffer.getRootContext();
+```
+
+## The Four Quadrants (Medicine Wheel)
+
+| Quadrant | Dimension | Asks | Examples |
+|----------|-----------|------|----------|
+| **Physical** | Material, embodied, land-based | What body will hold this? | Code, infrastructure, artifacts |
+| **Emotional** | Felt, relational, heart-centered | Who is affected? Where is the care? | Bonds, trust, harm, healing |
+| **Mental** | Analytical, logical, pattern-recognition | What is the structural logic? | Design, architecture, analysis |
+| **Spiritual** | Intuitive, visionary, dream-adjacent | Does this align with the deeper vision? | Ceremony, liminal insight, vision |
+
+If an agent only sees one quadrant, it is missing the rest of reality.
+
+## The Four Relational Sources
+
+| Source | Connection | Weight Context |
+|--------|------------|----------------|
+| **Land** | Grounded, embodied, place-based knowledge | Where this lives materially |
+| **Dream** | Liminal, intuitive, spirit-adjacent knowing | What the vision revealed |
+| **Code** | Technical artifacts, systems, implementations | How this manifests technically |
+| **Vision** | Deeper purpose and directional intent | Why this matters |
+
+## Value Constraints
+
+| Constraint | Severity | Purpose |
+|------------|----------|---------|
+| **Research Is Ceremony** | Hard Stop | Blocks Indigenous knowledge work without ceremony context |
+| **Relational Check-Back** | Hard Stop | Verifies Spirit (vision) and Body (code) alignment |
+| **Medicine Wheel Balance** | Warning | Warns when quadrants are neglected |
+| **Implicit Over Explicit** | Warning | Flags when values are overridden by technical asks |
+
+## Complete Workflow Example
+
+The `accountability-routing` example demonstrates end-to-end integration: a FireKeeper gates each agent action and a LangGraph-style state machine routes the session through the accountability lifecycle.
+
+```typescript
+// See examples/src/accountability-routing/agent_session_router.ts
+import { FireKeeper, ValueGate } from "ava-langchain-relational-intelligence";
+import { parseStateMachineSpec } from "ava-langchain-state-machine-spec";
+import spec from "./accountability_spec.json" assert { type: "json" };
+
+// 1. Parse and validate the state machine specification
+const machine = parseStateMachineSpec(spec);
+
+// 2. Initialise a FireKeeper with the session vision
+const keeper = new FireKeeper("Research relational AI architectures with care.");
+
+// 3. Gate every action through the FireKeeper before advancing state
+const review = keeper.processPrompt("Retrieve relevant papers from the knowledge graph");
+if (!review.accepted) {
+  throw new Error(`FireKeeper blocked: ${review.feedback}`);
+}
+if (review.requiresHumanEngagement) {
+  console.log("Human engagement requested:", review.feedback);
+}
+
+// 4. Advance the state machine only when the FireKeeper approves
+const transition = machine.states[machine.initialState].allowedTransitions[0];
+console.log(`Advancing to: ${transition}`);
+```
+
+See [`examples/src/accountability-routing/`](../../examples/src/accountability-routing/) for the full runnable example.
+
+## Integration with ava-langgraphjs
+
+These components are designed to be consumed by the LangGraph Narrative Intelligence Toolkit:
+
+```typescript
+import { FireKeeper, MedicineWheelFilter } from "ava-langchain-relational-intelligence";
+import { ThreeUniverseProcessor } from "ava-langgraph-narrative-intelligence";
+
+const keeper = new FireKeeper("Project vision...");
+const processor = new ThreeUniverseProcessor();
+
+// Gate three-universe analysis through the Medicine Wheel
+const analysis = processor.process(event, "github.push");
+const wheelAssessment = keeper.getWheelFilter().assess("event_1", event.content);
+
+const verdict = keeper.gateAction({
+  action: "Process event",
+  actionDescription: "Three-universe analysis",
+  agentId: "processor",
+  sessionId: "s1",
+  wheelAssessment,
+  metadata: { researchIsCeremonyGathered: true },
+});
+```
+
+## Epistemic Foundation
+
+This package is grounded in:
+
+- **Research Is Ceremony** (Wilson, 2008) - Relational accountability as the foundation of Indigenous research methodology
+- **Medicine Wheel** - Not a graphic but an ontological structure for understanding relational dimensions
+- **Epistemic Iteration** - Circling is ceremony; repetition deepens relationship, not redundancy
+- **Relational Accountability** - Importance is accountability, not salience
+
+## License
+
+MIT
+
+---
+
+# ava-langchain-narrative-tracing (0.1.11)
+
+Folder: chains/narrative-tracing
+
+# Narrative Tracing for LangChain.js
+
+A Langfuse-based tracing integration for the Narrative Intelligence Stack.
+
+## Overview
+
+This package provides narrative-aware observability across:
+- LangGraph (three-universe processing)
+- Flowise (agent coordination)
+- Langflow (routing)
+- Storytelling system (beat generation)
+
+## Installation
+
+```bash
+npm install @langchain/narrative-tracing
+```
+
+## Quick Start
+
+```typescript
+import {
+  NarrativeTracingHandler,
+  NarrativeTraceOrchestrator,
+  NarrativeTraceFormatter,
+  NarrativeEventType,
+} from '@langchain/narrative-tracing';
+
+// Create handler for simple tracing
+const handler = new NarrativeTracingHandler({
+  storyId: 'story_123',
+  sessionId: 'session_456',
+});
+
+// Start story generation
+const traceId = handler.startStoryGeneration();
+
+// Log beat creation
+handler.logBeatCreation(
+  'beat_001',
+  'The story begins with a mysterious event...',
+  1,
+  'inciting_incident',
+  { emotionalTone: 'intrigue' }
+);
+
+// Log three-universe analysis
+handler.logThreeUniverseAnalysis({
+  eventId: 'evt_123',
+  engineerIntent: 'feature_implementation',
+  engineerConfidence: 0.8,
+  ceremonyIntent: 'co_creation',
+  ceremonyConfidence: 0.7,
+  storyEngineIntent: 'rising_action',
+  storyEngineConfidence: 0.85,
+  leadUniverse: 'story_engine',
+  coherenceScore: 0.82,
+});
+
+// End generation
+handler.endStoryGeneration(totalMs);
+```
+
+## Components
+
+### NarrativeTracingHandler
+
+Direct handler for logging narrative events to Langfuse.
+
+```typescript
+const handler = new NarrativeTracingHandler({
+  storyId: 'story_123',
+  publicKey: process.env.LANGFUSE_PUBLIC_KEY,
+  secretKey: process.env.LANGFUSE_SECRET_KEY,
+});
+```
+
+### NarrativeTraceOrchestrator
+
+For cross-system trace correlation.
+
+```typescript
+const orchestrator = new NarrativeTraceOrchestrator();
+
+// Create root trace
+const root = orchestrator.createStoryGenerationRoot('story_123', 'session_456');
+
+// Create child spans
+const beatSpanId = orchestrator.createBeatSpan(
+  'beat_001',
+  'Content...',
+  1,
+  'rising_action',
+  root
+);
+
+// Inject headers for outgoing HTTP calls
+const headers = orchestrator.injectCorrelationHeader({}, root.traceId);
+
+// Finalize trace
+const completed = await orchestrator.finalizeStoryTrace(
+  root.traceId,
+  finalStory,
+  metrics
+);
+```
+
+### NarrativeTraceFormatter
+
+Format traces for human understanding.
+
+```typescript
+const formatter = new NarrativeTraceFormatter();
+
+// Display format
+console.log(formatter.formatForDisplay(completedTrace));
+
+// Timeline format
+console.log(formatter.formatAsTimeline(completedTrace));
+
+// Markdown export
+const markdown = formatter.exportAsMarkdown(completedTrace);
+
+// Get improvement suggestions
+const suggestions = formatter.generateImprovementSuggestions(metrics);
+```
+
+## Adapters
+
+### LangGraph Bridge
+
+Wire ThreeUniverseProcessor to narrative tracing.
+
+```typescript
+import { LangGraphBridge } from '@langchain/narrative-tracing/adapters';
+
+const bridge = new LangGraphBridge(handler);
+
+// Create callback for manual use
+const callback = bridge.createThreeUniverseCallback();
+callback({
+  eventId: 'evt_123',
+  engineerResult: { intent: 'feature_request', confidence: 0.8 },
+  ceremonyResult: { intent: 'co_creation', confidence: 0.7 },
+  storyEngineResult: { intent: 'rising_action', confidence: 0.85 },
+  leadUniverse: 'story_engine',
+  coherenceScore: 0.82,
+});
+
+// Or wrap processor function
+const traced = bridge.traceProcessor(processor.process.bind(processor));
+const result = await traced(event);
+```
+
+### Miadi Integration
+
+HTTP header-based trace correlation.
+
+```typescript
+import { MiadiIntegration } from '@langchain/narrative-tracing/adapters';
+
+const miadi = new MiadiIntegration(handler);
+
+// Inject headers for outgoing requests
+const headers = miadi.injectCorrelationHeaders({});
+// { 'X-Narrative-Trace-Id': '...', 'X-Story-Id': '...', ... }
+
+// Extract correlation from incoming request
+const context = miadi.extractCorrelation(request.headers);
+
+// Continue trace from headers
+miadi.continueTraceFromHeaders(request.headers);
+
+// Log webhook events
+miadi.logWebhookReceived(eventId, eventType, source);
+```
+
+### Storytelling Hooks
+
+Beat lifecycle tracing for the storytelling system.
+
+```typescript
+import { StorytellingHooks } from '@langchain/narrative-tracing/adapters';
+
+const hooks = new StorytellingHooks(handler);
+
+// Create beat tracer
+const tracer = hooks.createBeatTracer('beat_001');
+tracer.logContent('The story begins...', {
+  narrativeFunction: 'inciting_incident',
+  emotionalTone: 'wonder',
+});
+tracer.logAnalysis('wonder', 0.9);
+tracer.logEnrichment('dialogue', ['dialogue_enhancer'], 0.7, 0.85);
+hooks.finishBeatTracer(tracer);
+
+// Or direct logging
+hooks.logBeatCreation('beat_002', 'Content...', {
+  narrativeFunction: 'rising_action',
+});
+
+// Character arc updates
+hooks.logCharacterArcUpdate({
+  characterId: 'char_001',
+  characterName: 'The Builder',
+  arcPositionBefore: 0.2,
+  arcPositionAfter: 0.35,
+  growthDescription: 'Gained confidence in integration',
+});
+```
+
+## Event Types
+
+The package defines semantic event types for narrative operations:
+
+- **Beat Events**: `BEAT_CREATED`, `BEAT_ANALYZED`, `BEAT_ENRICHED`
+- **Story Events**: `STORY_GENERATION_START`, `STORY_GENERATION_END`, `STORY_QUALITY_METRICS`
+- **Three-Universe Events**: `THREE_UNIVERSE_ANALYSIS`, `UNIVERSE_PERSPECTIVE_SHIFT`
+- **Character Events**: `CHARACTER_ARC_UPDATED`, `CHARACTER_RELATIONSHIP_CHANGED`
+- **Theme Events**: `THEME_INTRODUCED`, `THEME_REINFORCED`, `THEME_RESOLVED`
+- **Routing Events**: `ROUTING_DECISION`, `FLOW_EXECUTED`
+- **Gap Events**: `GAP_IDENTIFIED`, `GAP_REMEDIATED`
+- **Checkpoint Events**: `NARRATIVE_CHECKPOINT`, `EPISODE_BOUNDARY`
+
+Each event type has an associated emoji glyph for human-readable display.
+
+## Environment Variables
+
+- `LANGFUSE_PUBLIC_KEY`: Langfuse public API key
+- `LANGFUSE_SECRET_KEY`: Langfuse secret API key
+- `LANGFUSE_HOST`: Langfuse host URL (optional)
+- `NARRATIVE_STORY_ID`: Default story ID
+- `COAIAPY_SESSION_ID`: Session ID for grouping
+- `COAIAPY_TRACE_ID`: Root trace ID
+
+## License
+
+MIT
+
+---
+
+# ava-langchain-inquiry-routing (0.1.11)
+
+Folder: chains/inquiry-routing
+
+# ava-langchain-inquiry-routing
+
+Inquiry Routing primitives for the Narrative Intelligence Stack — transforms PDE decomposition output into structured **Inquiries** routed to knowledge channels, enriched with Wilson's relational ontology and Two-Eyed Seeing epistemology.
+
+## What It Does
+
+After PDE decomposes a complex prompt into Four Directions, this package generates structured questions (Inquiries) from that decomposition and routes each to the appropriate knowledge channel:
+
+| Channel | Code | Purpose |
+|---------|------|---------|
+| **QMD Local** | `qmd-local` | Semantic search against workspace knowledge (lex/vec/hyde) |
+| **Deep Search Academic** | `deep-search-academic` | Research-grade queries for scholarly sources |
+| **Workspace Scan** | `workspace-scan` | File system exploration and dependency discovery |
+
+Every inquiry carries relational grounding (Wilson 2008), accountability markers, and optional Two-Eyed Seeing (Etuaptmumk) epistemological annotations.
+
+## Installation
+
+```bash
+pnpm add ava-langchain-inquiry-routing ava-langchain-prompt-decomposition
+```
+
+## Quick Start
+
+```typescript
+import { generateInquiries } from "ava-langchain-inquiry-routing";
+import { decompose } from "ava-langchain-prompt-decomposition";
+
+const pde = await decompose("Build a knowledge graph grounded in indigenous epistemology...");
+const result = generateInquiries(pde.decomposition);
+
+console.log(`Generated ${result.batch.total} inquiries`);
+console.log(result.markdown);
+```
+
+## Core Modules
+
+| Module | Direction | Purpose |
+|--------|-----------|---------|
+| `InquiryGenerator` | 🌅 EAST | Extracts inquiries from PDE decomposition output |
+| `InquiryRouter` | 🌿 SOUTH | Classifies and routes inquiries to channels |
+| `RelationalEnricher` | 🌊 WEST | Adds Wilson's relational fields and Two-Eyed Seeing markers |
+| `InquiryFormatter` | ⚡ NORTH | Formats inquiries for QMD, deep-search, markdown, JSON |
+
+## API
+
+### `generateInquiries(decomposition, options?)`
+
+Convenience function that runs the full pipeline: Generate → Enrich → Route → Format.
+
+```typescript
+import { generateInquiries } from "ava-langchain-inquiry-routing";
+
+const result = generateInquiries(decomposition, {
+  generator: { includeAmbiguities: true, minConfidence: 0.3 },
+  enricher: { addTwoEyedSeeing: true },
+  routing: { confidenceThreshold: 0.4 },
+});
+
+// result.batch: RoutedInquiryBatch
+// result.markdown: string
+// result.json: string
+```
+
+### `InquiryGenerator`
+
+Extracts inquiries from PDE decomposition output — directional insights become questions, ambiguities become verification inquiries, assumptions become verifiable claims.
+
+```typescript
+import { InquiryGenerator } from "ava-langchain-inquiry-routing";
+
+const generator = new InquiryGenerator({
+  includeAmbiguities: true,
+  includeAssumptions: true,
+  minConfidence: 0.3,
+});
+
+const batch = generator.generate(decomposition);
+const flat = generator.flatten(batch);
+```
+
+### `InquiryRouter`
+
+Routes inquiries to channels based on keyword classification and directional affinity.
+
+```typescript
+import { InquiryRouter } from "ava-langchain-inquiry-routing";
+
+const router = new InquiryRouter({
+  confidenceThreshold: 0.4,
+  qmdKeywords: ["schema", "model"],
+  deepSearchKeywords: ["Wilson", "ceremony"],
+});
+
+const decision = router.classify(inquiry);
+const routedBatch = router.routeAll(batch);
+```
+
+### `RelationalEnricher`
+
+Enriches inquiries with Wilson's relational accountability and Two-Eyed Seeing markers.
+
+```typescript
+import { RelationalEnricher } from "ava-langchain-inquiry-routing";
+
+const enricher = new RelationalEnricher({
+  addTwoEyedSeeing: true,
+  addCeremonialIntent: true,
+});
+
+const enriched = enricher.enrich(inquiry, "Additional relational context");
+const enrichedBatch = enricher.enrichBatch(batch);
+```
+
+### `InquiryFormatter`
+
+Formats inquiries for different output channels.
+
+```typescript
+import { InquiryFormatter } from "ava-langchain-inquiry-routing";
+
+const formatter = new InquiryFormatter();
+
+const qmd = formatter.toQmdQuery(inquiry);       // { mode: "vec", query, direction }
+const ds = formatter.toDeepSearchQuery(inquiry);  // { query, academic_context, search_terms }
+const md = formatter.toMarkdown(batch);           // Structured markdown report
+const json = formatter.toJSON(batch);             // JSON serialization
+```
+
+## Inquiry Structure
+
+```typescript
+interface Inquiry {
+  id: string;
+  timestamp: string;
+  direction: 'east' | 'south' | 'west' | 'north';
+  source: 'qmd-local' | 'deep-search-academic' | 'workspace-scan';
+  query: string;
+  response?: string;
+  status: 'pending' | 'routed' | 'completed' | 'failed';
+
+  // Relational grounding (Wilson's axiology)
+  relational_context: string;
+  accountability: string;
+  ceremonial_intent?: string;
+
+  // Two-Eyed Seeing markers
+  indigenous_lens?: string;
+  western_lens?: string;
+
+  // Traceability
+  pde_id: string;
+  action_index?: number;
+  confidence: number;
+}
+```
+
+## Direction → Channel Affinity
+
+| Direction | Default Channel | Rationale |
+|-----------|----------------|-----------|
+| 🌅 EAST (Vision) | QMD Local | Vision questions seek clarity from existing context |
+| 🌿 SOUTH (Analysis) | Deep Search Academic | Learning questions seek external knowledge |
+| 🌊 WEST (Validation) | QMD Local | Reflection questions test against existing work |
+| ⚡ NORTH (Action) | Workspace Scan | Execution questions need file/dependency awareness |
+
+## Related Packages
+
+- [`ava-langchain-prompt-decomposition`](../prompt-decomposition/) — PDE primitives (upstream)
+- `ava-langgraph-inquiry-routing-engine` — LangGraph orchestration engine (downstream, forthcoming)
+
+## References
+
+- Wilson, S. (2008). *Research is Ceremony: Indigenous Research Methods*
+- Bartlett, C., Marshall, M., & Marshall, A. (2012). Two-Eyed Seeing (Etuaptmumk)
+
+---
+
+# ava-langchain-state-machine-spec (0.1.11)
+
+Folder: chains/state-machine-spec
+
+# State Machine Spec for LangGraph
+
+Declarative state machine specifications with formal validation, relational accountability, and Mermaid visualization. A framework-agnostic specification layer that LangGraph (or any executor) can consume.
+
+## Overview
+
+LangGraph models workflows as graphs of action nodes. This package adds **states as first-class entities** — named conditions that represent where the system IS, not what it DOES. A JSON specification serves as the single source of truth for workflow logic.
+
+- **Spec Types** — TypeScript interfaces for states, transitions, and metadata
+- **Parser** — JSON parsing with snake_case/camelCase conversion (Python/TypeScript interop)
+- **Validator** — Formal verification: reachability, deadlock detection, terminal state consistency
+- **Visualizer** — Mermaid state diagrams, flowcharts, text summaries, adjacency matrices
+- **Relational Accountability** — Maps who holds responsibility at each state, detects accountability gaps
+
+## Installation
+
+```bash
+npm install ava-langchain-state-machine-spec
+```
+
+## Quick Start
+
+### Define a Spec
+
+```typescript
+import {
+  createStateMachineSpec,
+  createStateSpec,
+  createTransitionSpec,
+} from "ava-langchain-state-machine-spec";
+
+const spec = createStateMachineSpec(
+  "pr_review",
+  "Pull Request Review Workflow",
+  "initialized",
+  {
+    finalStates: ["merged", "closed"],
+    states: [
+      createStateSpec("initialized", "PR created and ready for review", {
+        allowedTransitions: ["to_under_review"],
+      }),
+      createStateSpec("under_review", "Being reviewed by maintainers", {
+        entryConditions: ["At least one reviewer assigned"],
+        allowedTransitions: ["to_approved", "to_changes_requested"],
+      }),
+      createStateSpec("approved", "Approved by required reviewers", {
+        allowedTransitions: ["to_merged"],
+      }),
+      createStateSpec("merged", "Merged into target branch", {
+        isTerminal: true,
+      }),
+      createStateSpec("closed", "Closed without merging", {
+        isTerminal: true,
+      }),
+    ],
+    transitions: [
+      createTransitionSpec("to_under_review", "initialized", "under_review", {
+        triggerEvents: ["reviewer_assigned"],
+        preconditions: ["PR is not draft"],
+      }),
+      createTransitionSpec("to_approved", "under_review", "approved", {
+        preconditions: ["All required reviewers approved"],
+      }),
+      createTransitionSpec("to_merged", "approved", "merged", {
+        preconditions: ["CI passes", "No merge conflicts"],
+        actions: ["merge_pr", "notify_team"],
+      }),
+    ],
+    metadata: {
+      version: "1.0.0",
+      author: "ava",
+      langgraphCompatible: true,
+      relationalContext: {
+        entities: ["author", "reviewer", "maintainer"],
+        responsibilities: "Author creates PR. Reviewer evaluates. Maintainer merges.",
+        stateResponsibilities: {
+          initialized: ["author"],
+          under_review: ["reviewer"],
+          approved: ["maintainer"],
+        },
+      },
+    },
+  }
+);
+```
+
+### Validate
+
+```typescript
+import { validateSpec, canAllStatesTerminate } from "ava-langchain-state-machine-spec";
+
+const result = validateSpec(spec);
+console.log(result.valid); // true
+console.log(result.properties.reachableStates);
+console.log(result.properties.deadlockedStates);
+
+const { canTerminate, stuckStates } = canAllStatesTerminate(spec);
+```
+
+### Visualize
+
+```typescript
+import {
+  generateMermaid,
+  generateTextSummary,
+} from "ava-langchain-state-machine-spec";
+
+// Mermaid state diagram
+const diagram = generateMermaid(spec, {
+  showConditions: true,
+  showActions: true,
+});
+
+// Plain text summary
+const summary = generateTextSummary(spec);
+```
+
+### Parse from JSON (Python interop)
+
+```typescript
+import { parseSpec, serializeSpecSnakeCase } from "ava-langchain-state-machine-spec";
+
+// Parse snake_case JSON from Python
+const spec = parseSpec(jsonString);
+
+// Serialize back to snake_case for Python consumption
+const snakeCaseJson = serializeSpecSnakeCase(spec);
+```
+
+### Relational Accountability
+
+```typescript
+import {
+  inferAccountabilityFromSpec,
+  findAccountabilityGaps,
+  generateAccountabilityNarrative,
+} from "ava-langchain-state-machine-spec";
+
+// Build accountability map from spec's relational context
+const map = inferAccountabilityFromSpec(spec);
+
+// Find states where no entity holds responsibility
+const gaps = findAccountabilityGaps(map);
+
+// Generate human-readable narrative of who is responsible where
+const narrative = generateAccountabilityNarrative(spec, map);
+```
+
+## Validation Checks
+
+The validator performs formal verification:
+
+| Check | Severity | Description |
+|-------|----------|-------------|
+| `MISSING_NAME` | ERROR | Spec must have a name |
+| `MISSING_INITIAL_STATE` | ERROR | Must define an initial state |
+| `INITIAL_STATE_NOT_FOUND` | ERROR | Initial state must exist in states list |
+| `FINAL_STATE_NOT_FOUND` | ERROR | Final states must exist in states list |
+| `DUPLICATE_STATE` | ERROR | State names must be unique |
+| `DUPLICATE_TRANSITION` | ERROR | Transition names must be unique |
+| `TRANSITION_FROM_UNKNOWN_STATE` | ERROR | Transition references valid from-state |
+| `TRANSITION_TO_UNKNOWN_STATE` | ERROR | Transition references valid to-state |
+| `TRANSITION_FROM_TERMINAL` | ERROR | Terminal states cannot have outgoing transitions |
+| `TERMINAL_HAS_OUTGOING` | ERROR | Terminal states should have no outgoing transitions |
+| `UNREACHABLE_STATE` | ERROR | All states reachable from initial |
+| `DEADLOCKED_STATE` | ERROR | Non-terminal states must have outgoing transitions |
+| `NO_FINAL_STATES` | WARNING | Workflows should eventually terminate |
+| `FINAL_STATE_NOT_TERMINAL` | WARNING | Final states should be marked isTerminal |
+| `TERMINAL_NOT_IN_FINAL` | WARNING | Terminal states should be in finalStates list |
+
+## Spec Format
+
+The JSON specification format:
+
+```json
+{
+  "name": "workflow_name",
+  "description": "What this workflow models",
+  "initial_state": "starting_state",
+  "final_states": ["end_state_a", "end_state_b"],
+  "states": [
+    {
+      "name": "state_name",
+      "description": "What this condition represents",
+      "entry_conditions": ["condition that must hold to enter"],
+      "exit_conditions": ["condition that must hold to leave"],
+      "allowed_transitions": ["transition_name"],
+      "is_terminal": false
+    }
+  ],
+  "transitions": [
+    {
+      "name": "transition_name",
+      "from_state": "source_state",
+      "to_state": "target_state",
+      "trigger_events": ["event_name"],
+      "preconditions": ["must be true to fire"],
+      "actions": ["execute_during_transition"],
+      "postconditions": ["must be true after"]
+    }
+  ],
+  "metadata": {
+    "version": "1.0.0",
+    "author": "ava",
+    "langgraph_compatible": true,
+    "relational_context": {
+      "entities": ["author", "reviewer"],
+      "responsibilities": "Who does what",
+      "state_responsibilities": {
+        "state_name": ["responsible_entity"]
+      }
+    }
+  }
+}
+```
+
+Both `snake_case` and `camelCase` field names are accepted by the parser.
+
+## Integration with Relational Intelligence
+
+This package optionally integrates with `ava-langchain-relational-intelligence` for Medicine Wheel assessment, value gating, and Fire Keeper coordination of state machine workflows.
+
+## Complete Workflow Example
+
+The `accountability-routing` example shows a FireKeeper coordinating a LangGraph-style state machine — every state transition is gated through relational accountability checks before the graph advances.
+
+```typescript
+// See examples/src/accountability-routing/agent_session_router.ts
+import { parseStateMachineSpec, validateStateMachineSpec } from "ava-langchain-state-machine-spec";
+import { FireKeeper } from "ava-langchain-relational-intelligence";
+import spec from "./accountability_spec.json" assert { type: "json" };
+
+// 1. Load and validate the spec
+const machine = parseStateMachineSpec(spec);
+const validation = validateStateMachineSpec(machine);
+if (!validation.valid) throw new Error(validation.errors.join(", "));
+
+// 2. FireKeeper gates every prompt before the graph advances
+const keeper = new FireKeeper("Build with relational care.");
+const review = keeper.processPrompt("Retrieve papers from knowledge graph");
+if (!review.accepted) throw new Error(`Blocked: ${review.feedback}`);
+
+// 3. Advance the state machine
+const next = machine.states[machine.initialState].allowedTransitions[0];
+console.log(`State: ${machine.initialState} → ${next}`);
+```
+
+See [`examples/src/accountability-routing/`](../../examples/src/accountability-routing/) for the full runnable example.
+
+## License
+
+MIT
+
+---
+
+# ava-langgraph-narrative-intelligence (0.2.1)
+
+Folder: graphs/narrative-intelligence
+
+# ava-langgraph-narrative-intelligence
+
+Narrative Intelligence Toolkit for JavaScript/TypeScript - a complete port of the Python `narrative-intelligence` package.
+
+## Overview
+
+This package provides the core narrative intelligence components for the LangGraph ecosystem:
+
+- **Three-Universe Processing** - Analyze events through Engineer (Mia), Ceremony (Ava8), and Story Engine (Miette) perspectives
+- **Narrative Coherence Analysis** - Score narrative quality across 5 dimensions with actionable gap identification
+- **Story Beat Classification** - Emotional tone detection using rule-based and LLM classification
+- **State Management** - Redis-backed persistence for cross-system state sharing
+
+## Installation
+
+```bash
+npm install ava-langgraph-narrative-intelligence
+# or
+yarn add ava-langgraph-narrative-intelligence
+```
+
+### Optional Dependencies
+
+```bash
+# For LangGraph integration
+npm install @langchain/langgraph
+
+# For Redis persistence
+npm install ioredis
+```
+
+## Quick Start
+
+### Three-Universe Processing
+
+Process any event through three interpretive lenses:
+
+```typescript
+import { ThreeUniverseProcessor } from "ava-langgraph-narrative-intelligence";
+
+const processor = new ThreeUniverseProcessor();
+
+// Process a GitHub event
+const analysis = processor.process(
+  { content: "feat: implement new feature together with team" },
+  "github.push"
+);
+
+console.log(`Lead universe: ${analysis.leadUniverse}`); // "ceremony" (collaborative work)
+console.log(`Coherence: ${analysis.coherenceScore}`); // 0.75
+
+// Access individual perspectives
+console.log(analysis.engineer.intent); // "feature_implementation"
+console.log(analysis.ceremony.intent); // "co_creation"
+console.log(analysis.storyEngine.intent); // "rising_action"
+```
+
+### Narrative Coherence Analysis
+
+Analyze the quality of story beats:
+
+```typescript
+import {
+  NarrativeCoherenceEngine,
+  createStoryBeat,
+  NarrativeFunction,
+} from "ava-langgraph-narrative-intelligence";
+
+const engine = new NarrativeCoherenceEngine();
+
+const beats = [
+  createStoryBeat("beat_1", 1, "Setup", NarrativeFunction.INCITING_INCIDENT, 1),
+  createStoryBeat("beat_2", 2, "Rising action", NarrativeFunction.RISING_ACTION, 2),
+  createStoryBeat("beat_3", 3, "Climax", NarrativeFunction.CLIMAX, 3),
+  createStoryBeat("beat_4", 4, "Resolution", NarrativeFunction.RESOLUTION, 3),
+];
+
+const result = engine.analyze(beats);
+
+// Overall coherence score (0-1)
+console.log(`Overall: ${result.coherenceScore.toFixed(2)}`);
+
+// Component scores (0-100)
+console.log(`Overall: ${result.coherenceBreakdown.overall}%`);
+console.log(`Narrative Flow: ${result.coherenceBreakdown.narrativeFlow.score}%`);
+console.log(`Pacing: ${result.coherenceBreakdown.pacing.score}%`);
+
+// Identified tensions (`gaps` is a deprecated alias)
+for (const tension of result.tensions) {
+  console.log(`Tension: ${tension.description} (${tension.severity})`);
+  console.log(`Route to: ${tension.suggestedRoute}`);
+}
+
+// Trinity assessment (Mia/Miette/Ava8)
+console.log(`Mia (structure): ${result.trinityAssessment.mia}`);
+console.log(`Miette (emotion): ${result.trinityAssessment.miette}`);
+console.log(`Ava8 (atmosphere): ${result.trinityAssessment.ava8}`);
+```
+
+### Unified Narrative State
+
+Create and manage narrative state across systems:
+
+```typescript
+import {
+  createUnifiedNarrativeState,
+  addBeat,
+  createStoryBeat,
+  NarrativeFunction,
+} from "ava-langgraph-narrative-intelligence";
+
+// Create a new state with default characters (Mia, Ava8, Miette)
+const state = createUnifiedNarrativeState("story_123", "session_456");
+
+// Add a beat
+const beat = createStoryBeat(
+  "beat_1",
+  1,
+  "The hero begins their journey",
+  NarrativeFunction.INCITING_INCIDENT,
+  1,
+  {
+    emotionalTone: "hopeful",
+    thematicTags: ["journey", "transformation"],
+  }
+);
+
+addBeat(state, beat);
+
+console.log(`Act: ${state.position.act}`);
+console.log(`Beat count: ${state.position.beatCount}`);
+console.log(`Lead universe: ${state.position.leadUniverse}`);
+```
+
+### Redis Persistence
+
+Use Redis for cross-system state sharing:
+
+```typescript
+import { NarrativeRedisManager, createRedisConfig } from "ava-langgraph-narrative-intelligence";
+
+const manager = new NarrativeRedisManager(createRedisConfig({
+  url: "redis://localhost:6379",
+}));
+
+await manager.connect();
+
+// Get or create state
+const state = await manager.getOrCreateState("story_123", "session_456");
+
+// Add beats
+await manager.addBeatToSession("session_456", beat);
+
+// Cache analysis
+await manager.cacheEventAnalysis("event_123", analysis);
+
+await manager.disconnect();
+```
+
+## The Three Universes
+
+The three-universe model from `multiverse_3act`:
+
+| Universe | Character | Focus | Keywords |
+|----------|-----------|-------|----------|
+| **ENGINEER** | Mia (The Builder) | Technical precision | feat:, fix:, refactor |
+| **CEREMONY** | Ava8 (The Keeper) | Relational protocols | together, thanks, collaborate |
+| **STORY_ENGINE** | Miette (The Weaver) | Narrative patterns | begin, climax, resolution |
+
+## Coherence Dimensions
+
+The coherence engine analyzes 5 dimensions:
+
+1. **Narrative Flow** - Smooth transitions, logical causality
+2. **Character Consistency** - Voice consistency, arc progression
+3. **Pacing** - Tension/relief distribution, climax positioning
+4. **Theme Saturation** - Theme presence and payoff
+5. **Continuity** - Timeline consistency, sequence ordering
+
+## Gap Types
+
+Identified gaps are categorized and routed:
+
+| Gap Type | Route To | Description |
+|----------|----------|-------------|
+| STRUCTURAL | Structurist | Missing beats, incomplete arcs |
+| THEMATIC | Structurist | Underdeveloped themes |
+| CHARACTER | Storyteller | Inconsistent character voice |
+| SENSORY | Storyteller | Lacking grounding detail |
+| CONTINUITY | Author | Timeline inconsistencies |
+
+## Emotional Tones
+
+The emotional classifier recognizes these tones:
+
+- Devastating, Hopeful, Tense, Joyful
+- Melancholic, Triumphant, Fearful, Peaceful
+- Conflicted, Resigned
+
+## Integration with narrative-tracing
+
+Connect to the `@langchain/langchain-narrative-tracing` package:
+
+```typescript
+import { LangGraphBridge } from "@langchain/langchain-narrative-tracing";
+import { ThreeUniverseProcessor } from "ava-langgraph-narrative-intelligence";
+
+const bridge = new LangGraphBridge(handler);
+
+const processor = new ThreeUniverseProcessor({
+  tracingCallback: bridge.createThreeUniverseCallback(),
+});
+
+// All analyses now get traced to Langfuse
+const analysis = processor.process(event, "github.push");
+```
+
+## API Reference
+
+### Exports
+
+```typescript
+// Main exports
+export {
+  // Processing
+  ThreeUniverseProcessor,
+  NarrativeCoherenceEngine,
+  EmotionalBeatClassifierNode,
+  
+  // State
+  UnifiedNarrativeState,
+  createUnifiedNarrativeState,
+  
+  // Types
+  Universe,
+  NarrativeFunction,
+  NarrativePhase,
+  GapType,
+  GapSeverity,
+  EmotionalTone,
+  
+  // Redis
+  NarrativeRedisManager,
+  MockRedis,
+} from "ava-langgraph-narrative-intelligence";
+
+// Subpath exports
+import * as schemas from "ava-langgraph-narrative-intelligence/schemas";
+import * as graphs from "ava-langgraph-narrative-intelligence/graphs";
+import * as nodes from "ava-langgraph-narrative-intelligence/nodes";
+import * as integrations from "ava-langgraph-narrative-intelligence/integrations";
+```
+
+## Python Parity
+
+This package is a complete TypeScript port of the Python `narrative-intelligence` package, maintaining full feature parity:
+
+| Python Module | TypeScript Module |
+|---------------|-------------------|
+| `narrative_intelligence/schemas/unified_state_bridge.py` | `schemas/unified_state_bridge.ts` |
+| `narrative_intelligence/schemas/ncp.py` | `schemas/ncp.ts` |
+| `narrative_intelligence/graphs/three_universe_processor.py` | `graphs/three_universe_processor.ts` |
+| `narrative_intelligence/graphs/coherence_engine.py` | `graphs/coherence_engine.ts` |
+| `narrative_intelligence/nodes/emotional_classifier.py` | `nodes/emotional_classifier.ts` |
+| `narrative_intelligence/integrations/redis_state.py` | `integrations/redis_state.ts` |
+
+## License
+
+MIT
+
+---
+
+# ava-langgraph-prompt-decomposition-engine (0.2.1)
+
+Folder: graphs/prompt-decomposition-engine
+
+# ava-langgraph-prompt-decomposition-engine
+
+Graph-level orchestration for the Prompt Decomposition Engine (PDE). This package provides a structured approach to breaking down complex prompts into actionable steps, incorporating multi-perspective analysis and relational accountability.
+
+## Overview
+
+The Prompt Decomposition Engine (PDE) orchestrates a multi-stage process for analyzing and decomposing user prompts. It leverages the "Four Directions" metaphor (EAST, SOUTH, WEST, NORTH) to guide the decomposition, integrating insights from the "Three Universes" (Engineer/Mia, Ceremony/Ava8, Story Engine/Miette) for a holistic understanding and generation of an execution plan.
+
+## Features
+
+-   **`DecompositionGraph`**: Orchestrates the core decomposition pipeline (EAST → SOUTH → WEST → NORTH).
+-   **Optional strategic decomposition**: Selects keyword, semantic, hybrid, or multi-pass decomposition and exposes versioned provenance for downstream graphs.
+-   **PDE lineage storage**: Persists flat artifacts or folder-backed PDE trees with parent-child and runtime provenance.
+-   **`PerspectiveAnalyzer`**: Analyzes prompt decompositions through the lenses of Engineer (Mia), Ceremony (Ava8), and Story Engine (Miette) universes, enriching the process with multi-dimensional insights.
+-   **`CeremonyGate`**: Provides a mechanism for relational accountability, gating execution based on ceremonial requirements and ethical considerations, ensuring thoughtful progression.
+
+## Installation
+
+```bash
+npm install ava-langgraph-prompt-decomposition-engine
+# or
+yarn add ava-langgraph-prompt-decomposition-engine
+```
+
+### Peer Dependencies
+
+This package relies on several peer dependencies for its full functionality:
+
+```bash
+npm install ava-langchain-relational-intelligence ava-langgraph-narrative-intelligence
+# or
+yarn add ava-langchain-relational-intelligence ava-langgraph-narrative-intelligence
+```
+
+## Quick Start
+
+```typescript
+import {
+  DecompositionGraph,
+  PerspectiveAnalyzer,
+  CeremonyGate,
+} from "ava-langgraph-prompt-decomposition-engine";
+
+const graph = new DecompositionGraph();
+const analyzer = new PerspectiveAnalyzer();
+const gate = new CeremonyGate();
+
+// Run the full pipeline
+const state = await graph.invoke("Build a relational intelligence system...");
+
+console.log("Decomposition Status:", state.status);
+
+// Analyze through three perspectives
+if (state.decomposition) {
+  const perspectives = analyzer.analyze(state.decomposition);
+  console.log("Lead Universe:", perspectives.leadUniverse);
+
+  // Evaluate if ceremony is needed
+  const verdict = gate.evaluate(state.decomposition, perspectives);
+
+  if (verdict.decision === "hold") {
+    console.log("Ceremony needed:", verdict.reasons);
+  } else {
+    console.log("Can proceed:", verdict.decision);
+  }
+}
+```
+
+### Strategy-Aware Handoff
+
+```typescript
+const graph = new DecompositionGraph({
+  strategy: {
+    enabled: true,
+    preferences: { alwaysMultiPass: true },
+  },
+  workdir: process.cwd(),
+  storage: { layout: "tree", engine: "codex" },
+});
+
+const state = await graph.invoke("Research, design, build, and validate the service.");
+
+// Pass this directly to ava-langgraph-inquiry-routing-engine.
+const handoff = state.decompositionWithProvenance;
+```
+
+## Core Concepts
+
+### The Four Directions of Decomposition
+
+The PDE process is structured around the "Four Directions," inspired by traditional Medicine Wheel teachings:
+
+-   **EAST (Vision)**: Focuses on initial intent extraction – "What is being asked?"
+-   **SOUTH (Analysis)**: Maps dependencies and computes the execution order – "What needs to be learned?"
+-   **WEST (Validation)**: Checks ceremonial requirements and relational balance – "What needs reflection?"
+-   **NORTH (Action)**: Builds the final action stack – "What executes?"
+
+### The Three Universes of Perspective
+
+Each decomposition is further enriched by perspectives from three interpretive universes:
+
+-   **Mia (Engineer)**: Focuses on technical feasibility, dependencies, and architectural considerations.
+-   **Ava8 (Ceremony)**: Emphasizes relational accountability, protocols, and governance.
+-   **Miette (Story Engine)**: Considers narrative coherence, emotional arcs, and overall meaning.
+
+### Ceremony Gating
+
+The `CeremonyGate` acts as a crucial checkpoint. It evaluates the decomposition and its multi-universe analysis to determine if a "ceremonial pause" or human review is required before proceeding to execution. This ensures that actions are not just technically feasible, but also relationally and ethically sound.
+
+## API Reference
+
+Consult the JSDoc comments within the source code for detailed API documentation.
+
+### Main Exports
+
+-   `DecompositionGraph`: The orchestrator for the decomposition pipeline.
+-   `DecompositionWithProvenance`: Stable decomposition plus strategy metadata handoff.
+-   `PerspectiveAnalyzer`: Tool for analyzing prompts through three universe lenses.
+-   `CeremonyGate`: Mechanism for evaluating ceremonial requirements and gating execution.
+-   Re-exports from `ava-langchain-prompt-decomposition`: Core primitives like `DirectionalDecomposer`, `IntentExtractor`, `DependencyMapper`, `ActionStackBuilder`, and `MedicineWheelBridge`.
+
+## License
+
+MIT
+
+---
+
+# ava-langgraph-inquiry-routing-engine (0.2.1)
+
+Folder: graphs/inquiry-routing-engine
+
+# ava-langgraph-inquiry-routing-engine
+
+Graph-level orchestration for the Inquiry Routing pipeline. This package provides a state-based graph that transforms PDE decomposition results into dispatch-ready inquiries, routing them through Four Directions with relational accountability gating and multi-channel formatting.
+
+## Overview
+
+The Inquiry Routing Engine sits downstream of the Prompt Decomposition Engine (PDE). It consumes either a legacy `DecompositionResult` or a strategy-aware `DecompositionWithProvenance` and orchestrates a four-stage pipeline:
+
+1. **EAST (Generate)** — Produce structured inquiries from decomposition actions
+2. **SOUTH (Route)** — Classify and route each inquiry to source channels (QMD, deep-search, workspace-scan)
+3. **WEST (Validate)** — Relational validation checks accountability, ceremonial markers, and Two-Eyed Seeing fields
+4. **NORTH (Dispatch)** — Format inquiries for their target channels as actionable query payloads
+
+## Features
+
+- **`InquiryRoutingGraph`**: Orchestrates the Generate→Route→Validate→Dispatch pipeline
+- **`RelationalValidator`**: Validates relational integrity with Wilson's axiological grounding
+- **`DispatchFormatter`**: Multi-channel formatting (QMD lex/vec/hyde, academic deep-search, workspace glob/grep)
+- **`createInquiryRoutingStateGraph()`**: LangGraph-compatible StateGraph factory for subgraph composition
+- **Ceremony Hold**: Configurable halt when Indigenous/ceremonial content lacks proper relational markers
+- **Strategy Validation**: Converts multi-pass strategy disagreements into WEST validation inquiries
+
+## Installation
+
+```bash
+npm install ava-langgraph-inquiry-routing-engine
+```
+
+### Peer Dependencies
+
+```bash
+npm install ava-langchain-prompt-decomposition ava-langchain-inquiry-routing
+```
+
+## Quick Start
+
+```typescript
+import { DecompositionGraph } from "ava-langgraph-prompt-decomposition-engine";
+import { InquiryRoutingGraph } from "ava-langgraph-inquiry-routing-engine";
+
+// First: decompose the prompt
+const pdeGraph = new DecompositionGraph();
+const pdeState = await pdeGraph.invoke("Research relational patterns. Build the API. Test integration.");
+
+// Then: route the inquiries
+const routingGraph = new InquiryRoutingGraph();
+const state = await routingGraph.invoke(pdeState.decomposition!);
+
+console.log("Status:", state.status);
+console.log("Inquiries generated:", state.inquiryBatch?.total);
+console.log("Relational score:", state.relationalValidation?.score);
+console.log("Dispatch payloads:", state.dispatchPayloads?.length);
+
+// Check for ceremony hold
+if (state.ceremonyRequired) {
+  console.log("⚠️ Ceremony required:", state.relationalValidation?.summary);
+}
+```
+
+For a strategy-aware PDE graph, pass the enriched handoff instead:
+
+```typescript
+const state = await routingGraph.invoke(
+  pdeState.decompositionWithProvenance!,
+);
+```
+
+## Architecture
+
+### State Flow
+
+```
+DecompositionResult | DecompositionWithProvenance
+        │
+        ▼
+  ┌─────────────┐
+  │ EAST:       │
+  │ Generate    │──→ InquiryBatch
+  └─────────────┘
+        │
+        ▼
+  ┌─────────────┐
+  │ SOUTH:      │
+  │ Route       │──→ RoutedInquiryBatch + RoutingDecisions
+  └─────────────┘
+        │
+        ▼
+  ┌─────────────┐       ceremony_hold
+  │ WEST:       │──────────────────────→ HALT
+  │ Validate    │
+  └─────────────┘
+        │ (pass)
+        ▼
+  ┌─────────────┐
+  │ NORTH:      │
+  │ Dispatch    │──→ FormattedDispatch[] (QMD/deep-search/workspace)
+  └─────────────┘
+```
+
+### Source Channels
+
+| Channel | Direction Affinity | Query Format |
+|---------|-------------------|--------------|
+| QMD Local | EAST, WEST | lex/vec/hyde semantic searches |
+| Deep Search Academic | SOUTH | Academic retrieval with Two-Eyed Seeing context |
+| Workspace Scan | NORTH | glob/grep patterns against codebase |
+
+### Relational Validation
+
+The `RelationalValidator` checks every inquiry for:
+- `relational_context` — relational grounding (Wilson's axiology)
+- `accountability` — relational obligations
+- `indigenous_lens` — required when Indigenous content is detected
+- `ceremonial_intent` — recommended for WEST-direction inquiries
+
+Missing fields produce warnings or hold-level flags. Hold flags trigger `ceremony_hold` status.
+
+## LangGraph Integration
+
+Use `createInquiryRoutingStateGraph()` to embed as a subgraph:
+
+```typescript
+import { createInquiryRoutingStateGraph } from "ava-langgraph-inquiry-routing-engine/graphs";
+
+const graph = await createInquiryRoutingStateGraph({ enforceCeremony: true });
+const compiled = graph.compile();
+
+const result = await compiled.invoke({
+  decomposition: myDecomposition,
+  pdeId: myDecomposition.id,
+  sessionId: "session-123",
+});
+```
+
+## API Reference
+
+### Graphs
+
+- `InquiryRoutingGraph` — Pure-function orchestrator (no LangGraph dependency needed)
+- `createInquiryRoutingStateGraph()` — LangGraph StateGraph factory (requires `@langchain/langgraph`)
+- `createInitialState(decomposition, sessionId?)` — State factory
+- `generateNode()`, `routeNode()`, `validateNode()`, `dispatchNode()` — Individual node functions
+
+### Nodes
+
+- `RelationalValidator` — Relational integrity validation
+- `DispatchFormatter` — Multi-channel query formatting
+
+### Re-exported from ava-langchain-inquiry-routing
+
+- `InquiryGenerator`, `InquiryRouter`, `InquiryFormatter`, `RelationalEnricher`
+- `Inquiry`, `InquiryBatch`, `RoutingDecision`, `RoutedInquiryBatch`
+
+## License
+
+MIT

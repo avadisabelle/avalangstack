@@ -1,0 +1,15 @@
+# AvaLangStack
+
+Chain primitives and the graph engines that compose them, for Ceremonial Technology Oriented Development.
+Source: https://github.com/avadisabelle/avalangstack — docs: https://avalangstack.sanctuaireagentique.com
+## Chains
+- ava-langchain-prompt-decomposition (0.1.11): Prompt Decomposition Engine primitives for the Narrative Intelligence Stack - Four Directions analysis, intent extraction, dependency mapping, and action stacking grounded in Medicine Wheel epistemology
+- ava-langchain-relational-intelligence (0.1.11): Relational Intelligence for the Narrative Intelligence Stack - Medicine Wheel ontology, importance units, epistemic iteration, value gates, and Fire Keeper coordination grounded in Indigenous relational paradigms
+- ava-langchain-narrative-tracing (0.1.11): Narrative Tracing for LangChain.js - Langfuse-based observability for the Narrative Intelligence Stack
+- ava-langchain-inquiry-routing (0.1.11): Inquiry Routing primitives for the Ava LangStack — transforms PDE decompositions into structured Inquiries routed to QMD (local semantic) and deep-search (academic) channels, grounded in Medicine Wheel epistemology and Wilson's relational ontology
+- ava-langchain-state-machine-spec (0.1.11): State Machine Specification layer for LangGraph - declarative workflow specs with formal validation, relational accountability, and Mermaid visualization
+
+## Graphs
+- ava-langgraph-narrative-intelligence (0.2.1): Narrative Intelligence Toolkit for LangGraph.js - Three-universe processing and NCP analysis
+- ava-langgraph-prompt-decomposition-engine (0.2.1): Prompt Decomposition Engine for LangGraph.js - Graph-level orchestration of Four Directions analysis, three-universe perspective processing, and ceremony gating
+- ava-langgraph-inquiry-routing-engine (0.2.1): Inquiry Routing Engine for LangGraph.js — Graph-level orchestration of PDE-to-Inquiry pipelines with Four Directions routing, relational accountability gating, and multi-channel dispatch

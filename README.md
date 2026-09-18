@@ -38,14 +38,27 @@ While they live here, graphs never take a chain from npm. `pnpm install` links e
 
 ```bash
 pnpm install
-pnpm build                       # chains first, then graphs
+pnpm build                       # chains in dependency order, then graphs
 pnpm test
 pnpm check:consumption           # every graph -> chain link points into chains/
+pnpm docs:dev                    # the documentation site, locally
+pnpm llms                        # regenerate llms.txt and llms-full.txt
+pnpm llms:check                  # fails when they are stale
 
 DRY_RUN=1 ./release.sh graph     # build chains, check links, build + test graphs, pack — publishes nothing
 ./release.sh chain patch         # the five ava-langchain-* packages, one shared version
 ./release.sh graph patch         # the three ava-langgraph-* packages, one shared version
 ```
+
+## Documentation, specs and lineage
+
+| Where | What |
+|---|---|
+| [`docs/`](docs) | The VitePress site served at [avalangstack.sanctuaireagentique.com](https://avalangstack.sanctuaireagentique.com): a page per library under [`docs/chains/`](docs/chains) and [`docs/graphs/`](docs/graphs) |
+| [`docs/rispecs/`](docs/rispecs) | The RISE specifications, split the way the code is: [`chains/`](docs/rispecs/chains) and [`graphs/`](docs/rispecs/graphs) |
+| [`docs/kinship/`](docs/kinship) | The kinship records each family wrote when they lived apart: what each place tends, offers, and depends on |
+| [`stc/`](stc) | Structural tension notes carried over from ava-langchainjs |
+| [`llms.txt`](llms.txt), [`llms-full.txt`](llms-full.txt) | Written by `pnpm llms` from the libraries themselves, and served at `/llms.txt` and `/llms-full.txt` |
 
 ## Where this came from
 

@@ -10,9 +10,15 @@
     "test": "pnpm -r test",
     "check:consumption": "node scripts/check-chain-consumption.mjs",
     "release:chain": "./release.sh chain",
-    "release:graph": "./release.sh graph"
+    "release:graph": "./release.sh graph",
+    "docs:dev": "vitepress dev docs",
+    "docs:build": "vitepress build docs",
+    "docs:preview": "vitepress preview docs",
+    "llms": "node scripts/generate-llms.mjs",
+    "llms:check": "node scripts/generate-llms.mjs --check"
   },
   "devDependencies": {
-    "semver": "^7.6.3"
+    "semver": "^7.6.3",
+    "vitepress": "^1.6.4"
   }
 }
