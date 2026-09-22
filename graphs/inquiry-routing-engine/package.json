@@ -1,6 +1,6 @@
 {
   "name": "ava-langgraph-inquiry-routing-engine",
-  "version": "0.2.1",
+  "version": "0.3.0",
   "description": "Inquiry Routing Engine for LangGraph.js — Graph-level orchestration of PDE-to-Inquiry pipelines with Four Directions routing, relational accountability gating, and multi-channel dispatch",
   "type": "module",
   "engines": {

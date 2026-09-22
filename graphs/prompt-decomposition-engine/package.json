@@ -1,6 +1,6 @@
 {
   "name": "ava-langgraph-prompt-decomposition-engine",
-  "version": "0.2.1",
+  "version": "0.3.0",
   "description": "Prompt Decomposition Engine for LangGraph.js - Graph-level orchestration of Four Directions analysis, three-perspective processing, and ceremony gating",
   "type": "module",
   "engines": {
