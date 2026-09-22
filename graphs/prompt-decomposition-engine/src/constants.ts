@@ -1,4 +1,4 @@
-export const UNIVERSE_KEYWORDS: Record<string, string[]> = {
+export const PERSPECTIVE_KEYWORDS: Record<string, string[]> = {
   engineer: [
     "build", "implement", "deploy", "code", "architecture", "pattern",
     "package", "module", "test", "dependency", "api", "schema",

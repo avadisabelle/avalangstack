@@ -245,6 +245,8 @@ export class NarrativeTraceOrchestrator {
       emotional: "🔍",
       thematic: "🎨",
       character_arc: "🎭",
+      three_perspective: "🌌",
+      // Legacy key, still accepted from callers.
       three_universe: "🌌",
     };
     const glyph = glyphMap[analysisType] || "🔬";

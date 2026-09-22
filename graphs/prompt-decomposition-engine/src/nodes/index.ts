@@ -1,9 +1,13 @@
 export {
+  PerspectiveType,
+  PERSPECTIVE_NAMES,
+  PerspectiveInsight,
+  ThreePerspectiveInsights,
+  PerspectiveAnalyzer,
+  // Deprecated aliases (pre-rename names)
   Universe,
   UNIVERSE_NAMES,
-  PerspectiveInsight,
   ThreeUniversePerspective,
-  PerspectiveAnalyzer,
 } from "./perspective_nodes.js";
 
 export {

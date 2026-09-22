@@ -317,18 +317,18 @@ These components are designed to be consumed by the LangGraph Narrative Intellig
 
 ```typescript
 import { FireKeeper, MedicineWheelFilter } from "ava-langchain-relational-intelligence";
-import { ThreeUniverseProcessor } from "ava-langgraph-narrative-intelligence";
+import { ThreePerspectiveProcessor } from "ava-langgraph-narrative-intelligence";
 
 const keeper = new FireKeeper("Project vision...");
-const processor = new ThreeUniverseProcessor();
+const processor = new ThreePerspectiveProcessor();
 
-// Gate three-universe analysis through the Medicine Wheel
+// Gate three-perspective analysis through the Medicine Wheel
 const analysis = processor.process(event, "github.push");
 const wheelAssessment = keeper.getWheelFilter().assess("event_1", event.content);
 
 const verdict = keeper.gateAction({
   action: "Process event",
-  actionDescription: "Three-universe analysis",
+  actionDescription: "Three-perspective analysis",
   agentId: "processor",
   sessionId: "s1",
   wheelAssessment,

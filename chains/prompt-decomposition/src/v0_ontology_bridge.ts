@@ -93,7 +93,7 @@ export const ONTOLOGY_CORE_MAP: Record<Direction, OntologyCoreConcept> = {
  * - The DecompositionGraph = ceremonial cadence pattern
  *
  * Existing packages that feed this:
- * - ava-langgraph-narrative-intelligence: ThreeUniverseProcessor, CoherenceEngine
+ * - ava-langgraph-narrative-intelligence: ThreePerspectiveProcessor, CoherenceEngine
  * - ava-langchain-narrative-tracing: Story beat observability
  */
 export interface NarrativeBeatMapping {
@@ -182,7 +182,7 @@ export const PACKAGE_MAPPING = {
   },
   "@medicine-wheel/narrative-engine": {
     existingPackages: [
-      "ava-langgraph-narrative-intelligence (ThreeUniverseProcessor, CoherenceEngine)",
+      "ava-langgraph-narrative-intelligence (ThreePerspectiveProcessor, CoherenceEngine)",
       "ava-langchain-narrative-tracing (NarrativeTracingHandler)",
       "ava-langgraph-prompt-decomposition-engine (DecompositionGraph)",
     ],

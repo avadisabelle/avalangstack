@@ -1,15 +1,15 @@
 /**
  * Perspective Nodes
  *
- * Three-universe perspective analysis of decomposed prompts.
- * Each prompt decomposition is viewed through three lenses:
+ * Three-perspective analysis of decomposed prompts.
+ * Each prompt decomposition is read from three perspectives:
  *
  * - Mia (Engineer): Technical feasibility, dependencies, architecture
  * - Ava8 (Ceremony): Relational accountability, protocol, governance
  * - Miette (Story Engine): Narrative coherence, emotional arc, meaning
  *
- * These perspectives enrich the PDE decomposition with multi-lens analysis
- * that bridges the Three-Universe Processor from narrative-intelligence.
+ * These perspectives enrich the PDE decomposition with the same three readings
+ * that the Three-Perspective Processor in narrative-intelligence produces.
  */
 
 import { v4 as uuid } from "uuid";
@@ -19,37 +19,60 @@ import type { DecompositionResult, Direction } from "ava-langchain-prompt-decomp
 // Types
 // =============================================================================
 
-export enum Universe {
+/**
+ * The three perspectives. Values are stored bare: `engineer`, `ceremony`,
+ * `story_engine`.
+ */
+export enum PerspectiveType {
   ENGINEER = "engineer",
   CEREMONY = "ceremony",
   STORY_ENGINE = "story_engine",
 }
 
-export const UNIVERSE_NAMES: Record<Universe, string> = {
-  [Universe.ENGINEER]: "Mia (Engineer)",
-  [Universe.CEREMONY]: "Ava8 (Ceremony)",
-  [Universe.STORY_ENGINE]: "Miette (Story Engine)",
+/**
+ * @deprecated use PerspectiveType
+ */
+export const Universe = PerspectiveType;
+/**
+ * @deprecated use PerspectiveType
+ */
+export type Universe = PerspectiveType;
+
+export const PERSPECTIVE_NAMES: Record<PerspectiveType, string> = {
+  [PerspectiveType.ENGINEER]: "Mia (Engineer)",
+  [PerspectiveType.CEREMONY]: "Ava8 (Ceremony)",
+  [PerspectiveType.STORY_ENGINE]: "Miette (Story Engine)",
 };
 
+/**
+ * @deprecated use PERSPECTIVE_NAMES
+ */
+export const UNIVERSE_NAMES = PERSPECTIVE_NAMES;
+
 export interface PerspectiveInsight {
-  universe: Universe;
+  perspectiveType: PerspectiveType;
   observation: string;
   relevantActions: string[]; // IDs from action stack
   confidence: number;
   flags: string[];
 }
 
-export interface ThreeUniversePerspective {
+export interface ThreePerspectiveInsights {
   id: string;
   timestamp: string;
   decompositionId: string;
   insights: PerspectiveInsight[];
-  leadUniverse: Universe;
+  leadPerspective: PerspectiveType;
   coherence: number; // How well the three perspectives align (0-1)
   synthesis: string;
 }
 
-import { UNIVERSE_KEYWORDS } from "../constants.js";
+/**
+ * @deprecated use ThreePerspectiveInsights
+ */
+export type ThreeUniversePerspective = ThreePerspectiveInsights;
+
+import { PERSPECTIVE_KEYWORDS } from "../constants.js";
 
 // =============================================================================
 // PerspectiveAnalyzer
@@ -57,21 +80,21 @@ import { UNIVERSE_KEYWORDS } from "../constants.js";
 
 export class PerspectiveAnalyzer {
   /**
-   * Analyze a decomposition result through three universe lenses.
+   * Read a decomposition result from the three perspectives.
    */
-  analyze(decomposition: DecompositionResult): ThreeUniversePerspective {
+  analyze(decomposition: DecompositionResult): ThreePerspectiveInsights {
     const id = uuid();
     const insights: PerspectiveInsight[] = [];
 
-    // Analyze through each universe
-    for (const universe of Object.values(Universe)) {
-      const insight = this.analyzeFromUniverse(universe, decomposition);
+    // Read from each perspective
+    for (const perspectiveType of Object.values(PerspectiveType)) {
+      const insight = this.analyzeFromPerspective(perspectiveType, decomposition);
       insights.push(insight);
     }
 
-    // Determine lead universe
+    // Determine lead perspective
     const sorted = [...insights].sort((a, b) => b.confidence - a.confidence);
-    const leadUniverse = sorted[0].universe;
+    const leadPerspective = sorted[0].perspectiveType;
 
     // Calculate coherence (how well they agree on priorities)
     const coherence = this.calculateCoherence(insights, decomposition);
@@ -84,7 +107,7 @@ export class PerspectiveAnalyzer {
       timestamp: new Date().toISOString(),
       decompositionId: decomposition.id,
       insights,
-      leadUniverse,
+      leadPerspective,
       coherence,
       synthesis,
     };
@@ -94,11 +117,11 @@ export class PerspectiveAnalyzer {
   // Internal
   // ---------------------------------------------------------------------------
 
-  private analyzeFromUniverse(
-    universe: Universe,
+  private analyzeFromPerspective(
+    perspectiveType: PerspectiveType,
     decomposition: DecompositionResult
   ): PerspectiveInsight {
-    const keywords = UNIVERSE_KEYWORDS[universe];
+    const keywords = PERSPECTIVE_KEYWORDS[perspectiveType];
     const promptLower = decomposition.prompt.toLowerCase();
     const flags: string[] = [];
     const relevantActions: string[] = [];
@@ -121,11 +144,11 @@ export class PerspectiveAnalyzer {
       }
     }
 
-    // Generate observation and flags based on universe
+    // Generate observation and flags based on the perspective
     let observation: string;
 
-    switch (universe) {
-      case Universe.ENGINEER: {
+    switch (perspectiveType) {
+      case PerspectiveType.ENGINEER: {
         const hasTests = decomposition.actionStack.some(
           (a) => a.direction === ("west" as Direction)
         );
@@ -135,7 +158,7 @@ export class PerspectiveAnalyzer {
         if (decomposition.balance < 0.3) flags.push("Unbalanced — may need architectural review");
         break;
       }
-      case Universe.CEREMONY: {
+      case PerspectiveType.CEREMONY: {
         const hasWest = decomposition.directions.west?.length > 0;
         const hasEast = decomposition.directions.east?.length > 0;
         observation = `Relational coverage: EAST(vision)=${decomposition.directions.east?.length ?? 0}, WEST(ceremony)=${decomposition.directions.west?.length ?? 0} insights.`;
@@ -146,7 +169,7 @@ export class PerspectiveAnalyzer {
         }
         break;
       }
-      case Universe.STORY_ENGINE: {
+      case PerspectiveType.STORY_ENGINE: {
         const hasArc = decomposition.actionStack.length > 3;
         observation = `Narrative shape: ${decomposition.actionStack.length}-step journey, ${decomposition.leadDirection} led.`;
         if (!hasArc) flags.push("Very short arc — may lack narrative depth");
@@ -158,7 +181,7 @@ export class PerspectiveAnalyzer {
     }
 
     return {
-      universe,
+      perspectiveType,
       observation,
       relevantActions,
       confidence,

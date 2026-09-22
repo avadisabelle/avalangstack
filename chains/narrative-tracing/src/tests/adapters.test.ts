@@ -1,7 +1,7 @@
 import { describe, it, expect, beforeEach, vi } from "vitest";
 import {
   LangGraphBridge,
-  ThreeUniverseAnalysisLike,
+  ThreePerspectiveAnalysisLike,
 } from "../adapters/langgraph_bridge.js";
 import {
   PromptDecompositionBridge,
@@ -49,7 +49,7 @@ describe("LangGraphBridge", () => {
   beforeEach(() => {
     // Create a mock handler with necessary methods
     mockHandler = {
-      logThreeUniverseAnalysis: vi.fn().mockReturnValue("span_123"),
+      logThreePerspectiveAnalysis: vi.fn().mockReturnValue("span_123"),
       logBeatCreation: vi.fn().mockReturnValue("span_456"),
       logEvent: vi.fn().mockReturnValue("generic_span_id"),
       flush: vi.fn(),
@@ -58,9 +58,9 @@ describe("LangGraphBridge", () => {
     bridge = new LangGraphBridge(mockHandler);
   });
 
-  describe("createThreeUniverseCallback", () => {
+  describe("createThreePerspectiveCallback", () => {
     it("should create a callback that logs analysis", () => {
-      const callback = bridge.createThreeUniverseCallback();
+      const callback = bridge.createThreePerspectiveCallback();
 
       const spanId = callback({
         eventId: "evt_123",
@@ -68,12 +68,12 @@ describe("LangGraphBridge", () => {
         engineerResult: { intent: "feature_implementation", confidence: 0.8 },
         ceremonyResult: { intent: "co_creation", confidence: 0.7 },
         storyEngineResult: { intent: "rising_action", confidence: 0.85 },
-        leadUniverse: "story_engine",
+        leadPerspective: "story_engine",
         coherenceScore: 0.82,
       });
 
       expect(spanId).toBe("span_123");
-      expect(mockHandler.logThreeUniverseAnalysis).toHaveBeenCalledWith({
+      expect(mockHandler.logThreePerspectiveAnalysis).toHaveBeenCalledWith({
         eventId: "evt_123",
         engineerIntent: "feature_implementation",
         engineerConfidence: 0.8,
@@ -81,14 +81,14 @@ describe("LangGraphBridge", () => {
         ceremonyConfidence: 0.7,
         storyEngineIntent: "rising_action",
         storyEngineConfidence: 0.85,
-        leadUniverse: "story_engine",
+        leadPerspective: "story_engine",
         coherenceScore: 0.82,
         parentSpanId: undefined,
       });
     });
 
     it("should validate coherence score range", () => {
-      const callback = bridge.createThreeUniverseCallback();
+      const callback = bridge.createThreePerspectiveCallback();
 
       expect(() =>
         callback({
@@ -97,7 +97,7 @@ describe("LangGraphBridge", () => {
           engineerResult: { intent: "test", confidence: 0.5 },
           ceremonyResult: { intent: "test", confidence: 0.5 },
           storyEngineResult: { intent: "test", confidence: 0.5 },
-          leadUniverse: "engineer",
+          leadPerspective: "engineer",
           coherenceScore: 1.5, // Invalid
         })
       ).toThrow("coherence_score must be between 0.0 and 1.0");
@@ -109,14 +109,14 @@ describe("LangGraphBridge", () => {
           engineerResult: { intent: "test", confidence: 0.5 },
           ceremonyResult: { intent: "test", confidence: 0.5 },
           storyEngineResult: { intent: "test", confidence: 0.5 },
-          leadUniverse: "engineer",
+          leadPerspective: "engineer",
           coherenceScore: -0.1, // Invalid
         })
       ).toThrow("coherence_score must be between 0.0 and 1.0");
     });
 
-    it("should validate lead universe", () => {
-      const callback = bridge.createThreeUniverseCallback();
+    it("should validate lead perspective", () => {
+      const callback = bridge.createThreePerspectiveCallback();
 
       expect(() =>
         callback({
@@ -125,14 +125,14 @@ describe("LangGraphBridge", () => {
           engineerResult: { intent: "test", confidence: 0.5 },
           ceremonyResult: { intent: "test", confidence: 0.5 },
           storyEngineResult: { intent: "test", confidence: 0.5 },
-          leadUniverse: "invalid_universe", // Invalid
+          leadPerspective: "invalid_perspective", // Invalid
           coherenceScore: 0.8,
         })
       ).toThrow("lead_universe must be one of");
     });
 
     it("should increment analysis count", () => {
-      const callback = bridge.createThreeUniverseCallback();
+      const callback = bridge.createThreePerspectiveCallback();
 
       expect(bridge.analysisCount).toBe(0);
 
@@ -142,7 +142,7 @@ describe("LangGraphBridge", () => {
         engineerResult: { intent: "test", confidence: 0.5 },
         ceremonyResult: { intent: "test", confidence: 0.5 },
         storyEngineResult: { intent: "test", confidence: 0.5 },
-        leadUniverse: "engineer",
+        leadPerspective: "engineer",
         coherenceScore: 0.8,
       });
 
@@ -154,7 +154,7 @@ describe("LangGraphBridge", () => {
         engineerResult: { intent: "test", confidence: 0.5 },
         ceremonyResult: { intent: "test", confidence: 0.5 },
         storyEngineResult: { intent: "test", confidence: 0.5 },
-        leadUniverse: "ceremony",
+        leadPerspective: "ceremony",
         coherenceScore: 0.7,
       });
 
@@ -164,18 +164,18 @@ describe("LangGraphBridge", () => {
 
   describe("logAnalysis", () => {
     it("should log analysis object directly", () => {
-      const analysis: ThreeUniverseAnalysisLike = {
+      const analysis: ThreePerspectiveAnalysisLike = {
         engineer: { intent: "feature_request", confidence: 0.9 },
         ceremony: { intent: "ritual", confidence: 0.6 },
         storyEngine: { intent: "inciting_incident", confidence: 0.95 },
-        leadUniverse: "story_engine",
+        leadPerspective: "story_engine",
         coherenceScore: 0.88,
       };
 
       const spanId = bridge.logAnalysis("evt_123", analysis);
 
       expect(spanId).toBe("span_123");
-      expect(mockHandler.logThreeUniverseAnalysis).toHaveBeenCalledWith({
+      expect(mockHandler.logThreePerspectiveAnalysis).toHaveBeenCalledWith({
         eventId: "evt_123",
         engineerIntent: "feature_request",
         engineerConfidence: 0.9,
@@ -183,26 +183,26 @@ describe("LangGraphBridge", () => {
         ceremonyConfidence: 0.6,
         storyEngineIntent: "inciting_incident",
         storyEngineConfidence: 0.95,
-        leadUniverse: "story_engine",
+        leadPerspective: "story_engine",
         coherenceScore: 0.88,
         parentSpanId: undefined,
       });
     });
 
-    it("should handle enum-style leadUniverse", () => {
-      const analysis: ThreeUniverseAnalysisLike = {
+    it("should handle enum-style leadPerspective", () => {
+      const analysis: ThreePerspectiveAnalysisLike = {
         engineer: { intent: "test", confidence: 0.5 },
         ceremony: { intent: "test", confidence: 0.5 },
         storyEngine: { intent: "test", confidence: 0.5 },
-        leadUniverse: { value: "ceremony" },
+        leadPerspective: { value: "ceremony" },
         coherenceScore: 0.75,
       };
 
       bridge.logAnalysis("evt_123", analysis);
 
-      expect(mockHandler.logThreeUniverseAnalysis).toHaveBeenCalledWith(
+      expect(mockHandler.logThreePerspectiveAnalysis).toHaveBeenCalledWith(
         expect.objectContaining({
-          leadUniverse: "ceremony",
+          leadPerspective: "ceremony",
         })
       );
     });
@@ -224,19 +224,19 @@ describe("LangGraphBridge", () => {
         1,
         "inciting_incident",
         {
-          source: "three_universe_processor",
+          source: "three_perspective_processor",
           emotionalTone: undefined,
           parentSpanId: undefined,
         }
       );
     });
 
-    it("should use lead universe as source when analysis provided", () => {
-      const analysis: ThreeUniverseAnalysisLike = {
+    it("should use lead perspective as source when analysis provided", () => {
+      const analysis: ThreePerspectiveAnalysisLike = {
         engineer: { intent: "test", confidence: 0.5 },
         ceremony: { intent: "test", confidence: 0.5 },
         storyEngine: { intent: "test", confidence: 0.5 },
-        leadUniverse: "engineer",
+        leadPerspective: "engineer",
         coherenceScore: 0.8,
       };
 
@@ -262,7 +262,7 @@ describe("LangGraphBridge", () => {
         engineer: { intent: "test", confidence: 0.5 },
         ceremony: { intent: "test", confidence: 0.5 },
         storyEngine: { intent: "test", confidence: 0.5 },
-        leadUniverse: "engineer",
+        leadPerspective: "engineer",
         coherenceScore: 0.8,
       });
 
@@ -271,8 +271,8 @@ describe("LangGraphBridge", () => {
       const result = await wrapped(event);
 
       expect(mockProcessor).toHaveBeenCalledWith(event);
-      expect(mockHandler.logThreeUniverseAnalysis).toHaveBeenCalled();
-      expect(result.leadUniverse).toBe("engineer");
+      expect(mockHandler.logThreePerspectiveAnalysis).toHaveBeenCalled();
+      expect(result.leadPerspective).toBe("engineer");
     });
 
     it("should use custom event ID extractor", async () => {
@@ -280,7 +280,7 @@ describe("LangGraphBridge", () => {
         engineer: { intent: "test", confidence: 0.5 },
         ceremony: { intent: "test", confidence: 0.5 },
         storyEngine: { intent: "test", confidence: 0.5 },
-        leadUniverse: "ceremony",
+        leadPerspective: "ceremony",
         coherenceScore: 0.9,
       });
 
@@ -291,7 +291,7 @@ describe("LangGraphBridge", () => {
 
       await wrapped({ id: "42" });
 
-      expect(mockHandler.logThreeUniverseAnalysis).toHaveBeenCalledWith(
+      expect(mockHandler.logThreePerspectiveAnalysis).toHaveBeenCalledWith(
         expect.objectContaining({
           eventId: "custom_42",
         })
@@ -301,7 +301,7 @@ describe("LangGraphBridge", () => {
 
   describe("resetCount", () => {
     it("should reset analysis count", () => {
-      const callback = bridge.createThreeUniverseCallback();
+      const callback = bridge.createThreePerspectiveCallback();
 
       callback({
         eventId: "evt_1",
@@ -309,7 +309,7 @@ describe("LangGraphBridge", () => {
         engineerResult: { intent: "test", confidence: 0.5 },
         ceremonyResult: { intent: "test", confidence: 0.5 },
         storyEngineResult: { intent: "test", confidence: 0.5 },
-        leadUniverse: "engineer",
+        leadPerspective: "engineer",
         coherenceScore: 0.8,
       });
 
@@ -318,6 +318,58 @@ describe("LangGraphBridge", () => {
       bridge.resetCount();
 
       expect(bridge.analysisCount).toBe(0);
+    });
+  });
+
+  describe("legacy names and keys", () => {
+    it("deprecated createThreeUniverseCallback accepts leadUniverse and logs leadPerspective", () => {
+      const callback = bridge.createThreeUniverseCallback();
+
+      callback({
+        eventId: "evt_legacy",
+        eventContent: "Test",
+        engineerResult: { intent: "test", confidence: 0.5 },
+        ceremonyResult: { intent: "test", confidence: 0.5 },
+        storyEngineResult: { intent: "test", confidence: 0.5 },
+        leadUniverse: "ceremony",
+        coherenceScore: 0.8,
+      });
+
+      expect(mockHandler.logThreePerspectiveAnalysis).toHaveBeenCalledWith(
+        expect.objectContaining({ leadPerspective: "ceremony" })
+      );
+    });
+
+    it("logAnalysis reads a legacy leadUniverse key", () => {
+      bridge.logAnalysis("evt_legacy", {
+        engineer: { intent: "test", confidence: 0.5 },
+        ceremony: { intent: "test", confidence: 0.5 },
+        storyEngine: { intent: "test", confidence: 0.5 },
+        leadUniverse: "engineer",
+        coherenceScore: 0.7,
+      });
+
+      expect(mockHandler.logThreePerspectiveAnalysis).toHaveBeenCalledWith(
+        expect.objectContaining({ leadPerspective: "engineer" })
+      );
+    });
+
+    it("maps legacy -world values to the bare perspective values", () => {
+      const callback = bridge.createThreePerspectiveCallback();
+
+      callback({
+        eventId: "evt_world",
+        eventContent: "Test",
+        engineerResult: { intent: "test", confidence: 0.5 },
+        ceremonyResult: { intent: "test", confidence: 0.5 },
+        storyEngineResult: { intent: "test", confidence: 0.5 },
+        leadPerspective: "story-engine-world",
+        coherenceScore: 0.8,
+      });
+
+      expect(mockHandler.logThreePerspectiveAnalysis).toHaveBeenCalledWith(
+        expect.objectContaining({ leadPerspective: "story_engine" })
+      );
     });
   });
 });

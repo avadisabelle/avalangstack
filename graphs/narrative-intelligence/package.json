@@ -1,7 +1,7 @@
 {
   "name": "ava-langgraph-narrative-intelligence",
   "version": "0.2.1",
-  "description": "Narrative Intelligence Toolkit for LangGraph.js - Three-universe processing and NCP analysis",
+  "description": "Narrative Intelligence Toolkit for LangGraph.js - Three-perspective processing and NCP analysis",
   "type": "module",
   "engines": {
     "node": ">=18"
@@ -60,7 +60,7 @@
     "langgraph",
     "narrative",
     "intelligence",
-    "three-universe",
+    "three-perspective",
     "ncp",
     "storytelling"
   ],

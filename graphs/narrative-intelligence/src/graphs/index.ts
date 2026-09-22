@@ -2,13 +2,13 @@
  * Graph exports for narrative-intelligence
  */
 
-// Three Universe Processor
+// Three-Perspective Processor
 export {
   // Enums
   EventType,
   // Interfaces
   ProcessedEvent,
-  ThreeUniverseState,
+  ThreePerspectiveState,
   AnalysisCallback,
   // Functions
   engineerIntentKeywords,
@@ -19,8 +19,11 @@ export {
   analyzeStoryEnginePerspective,
   synthesizePerspectives,
   // Main class
+  ThreePerspectiveProcessor,
+  // Deprecated aliases (pre-rename names)
+  ThreeUniverseState,
   ThreeUniverseProcessor,
-} from "./three_universe_processor.js";
+} from "./three_perspective_processor.js";
 
 // Coherence Engine
 export {

@@ -423,18 +423,18 @@ These components are designed to be consumed by the LangGraph Narrative Intellig
 
 ```typescript
 import { FireKeeper, MedicineWheelFilter } from "ava-langchain-relational-intelligence";
-import { ThreeUniverseProcessor } from "ava-langgraph-narrative-intelligence";
+import { ThreePerspectiveProcessor } from "ava-langgraph-narrative-intelligence";
 
 const keeper = new FireKeeper("Project vision...");
-const processor = new ThreeUniverseProcessor();
+const processor = new ThreePerspectiveProcessor();
 
-// Gate three-universe analysis through the Medicine Wheel
+// Gate three-perspective analysis through the Medicine Wheel
 const analysis = processor.process(event, "github.push");
 const wheelAssessment = keeper.getWheelFilter().assess("event_1", event.content);
 
 const verdict = keeper.gateAction({
   action: "Process event",
-  actionDescription: "Three-universe analysis",
+  actionDescription: "Three-perspective analysis",
   agentId: "processor",
   sessionId: "s1",
   wheelAssessment,
@@ -468,7 +468,7 @@ A Langfuse-based tracing integration for the Narrative Intelligence Stack.
 ## Overview
 
 This package provides narrative-aware observability across:
-- LangGraph (three-universe processing)
+- LangGraph (three-perspective processing)
 - Flowise (agent coordination)
 - Langflow (routing)
 - Storytelling system (beat generation)
@@ -507,8 +507,8 @@ handler.logBeatCreation(
   { emotionalTone: 'intrigue' }
 );
 
-// Log three-universe analysis
-handler.logThreeUniverseAnalysis({
+// Log three-perspective analysis
+handler.logThreePerspectiveAnalysis({
   eventId: 'evt_123',
   engineerIntent: 'feature_implementation',
   engineerConfidence: 0.8,
@@ -516,7 +516,7 @@ handler.logThreeUniverseAnalysis({
   ceremonyConfidence: 0.7,
   storyEngineIntent: 'rising_action',
   storyEngineConfidence: 0.85,
-  leadUniverse: 'story_engine',
+  leadPerspective: 'story_engine',
   coherenceScore: 0.82,
 });
 
@@ -592,7 +592,7 @@ const suggestions = formatter.generateImprovementSuggestions(metrics);
 
 ### LangGraph Bridge
 
-Wire ThreeUniverseProcessor to narrative tracing.
+Wire ThreePerspectiveProcessor to narrative tracing.
 
 ```typescript
 import { LangGraphBridge } from '@langchain/narrative-tracing/adapters';
@@ -600,13 +600,13 @@ import { LangGraphBridge } from '@langchain/narrative-tracing/adapters';
 const bridge = new LangGraphBridge(handler);
 
 // Create callback for manual use
-const callback = bridge.createThreeUniverseCallback();
+const callback = bridge.createThreePerspectiveCallback();
 callback({
   eventId: 'evt_123',
   engineerResult: { intent: 'feature_request', confidence: 0.8 },
   ceremonyResult: { intent: 'co_creation', confidence: 0.7 },
   storyEngineResult: { intent: 'rising_action', confidence: 0.85 },
-  leadUniverse: 'story_engine',
+  leadPerspective: 'story_engine',
   coherenceScore: 0.82,
 });
 
@@ -678,7 +678,7 @@ The package defines semantic event types for narrative operations:
 
 - **Beat Events**: `BEAT_CREATED`, `BEAT_ANALYZED`, `BEAT_ENRICHED`
 - **Story Events**: `STORY_GENERATION_START`, `STORY_GENERATION_END`, `STORY_QUALITY_METRICS`
-- **Three-Universe Events**: `THREE_UNIVERSE_ANALYSIS`, `UNIVERSE_PERSPECTIVE_SHIFT`
+- **Three-Perspective Events**: `THREE_PERSPECTIVE_ANALYSIS`, `PERSPECTIVE_SHIFT`
 - **Character Events**: `CHARACTER_ARC_UPDATED`, `CHARACTER_RELATIONSHIP_CHANGED`
 - **Theme Events**: `THEME_INTRODUCED`, `THEME_REINFORCED`, `THEME_RESOLVED`
 - **Routing Events**: `ROUTING_DECISION`, `FLOW_EXECUTED`
@@ -686,6 +686,8 @@ The package defines semantic event types for narrative operations:
 - **Checkpoint Events**: `NARRATIVE_CHECKPOINT`, `EPISODE_BOUNDARY`
 
 Each event type has an associated emoji glyph for human-readable display.
+
+Earlier releases called the three readings "universes". `logThreeUniverseAnalysis`, `createThreeUniverseCallback`, `ThreeUniverseAnalysisLike`, `UniverseResult` and the `leadUniverse` option remain as deprecated aliases. Spans are now written with `lead_perspective` and the `narrative.three_perspective.analysis` event type, and metrics with `crossPerspectiveCoherence`. The formatter and episode bundler also read spans and metrics recorded with `leadUniverse`, `narrative.three_universe.analysis` and `crossUniverseCoherence`, which keep their `THREE_UNIVERSE_ANALYSIS` and `UNIVERSE_PERSPECTIVE_SHIFT` enum members.
 
 ## Environment Variables
 
@@ -1155,7 +1157,7 @@ Narrative Intelligence Toolkit for JavaScript/TypeScript - a complete port of th
 
 This package provides the core narrative intelligence components for the LangGraph ecosystem:
 
-- **Three-Universe Processing** - Analyze events through Engineer (Mia), Ceremony (Ava8), and Story Engine (Miette) perspectives
+- **Three-Perspective Processing** - Read each event from the Engineer (Mia), Ceremony (Ava8), and Story Engine (Miette) perspectives
 - **Narrative Coherence Analysis** - Score narrative quality across 5 dimensions with actionable gap identification
 - **Story Beat Classification** - Emotional tone detection using rule-based and LLM classification
 - **State Management** - Redis-backed persistence for cross-system state sharing
@@ -1180,14 +1182,16 @@ npm install ioredis
 
 ## Quick Start
 
-### Three-Universe Processing
+<a id="three-universe-processing"></a>
 
-Process any event through three interpretive lenses:
+### Three-Perspective Processing
+
+Read any event from three perspectives:
 
 ```typescript
-import { ThreeUniverseProcessor } from "ava-langgraph-narrative-intelligence";
+import { ThreePerspectiveProcessor } from "ava-langgraph-narrative-intelligence";
 
-const processor = new ThreeUniverseProcessor();
+const processor = new ThreePerspectiveProcessor();
 
 // Process a GitHub event
 const analysis = processor.process(
@@ -1195,10 +1199,10 @@ const analysis = processor.process(
   "github.push"
 );
 
-console.log(`Lead universe: ${analysis.leadUniverse}`); // "ceremony" (collaborative work)
+console.log(`Lead perspective: ${analysis.leadPerspective}`); // "ceremony" (collaborative work)
 console.log(`Coherence: ${analysis.coherenceScore}`); // 0.75
 
-// Access individual perspectives
+// Access each perspective's reading
 console.log(analysis.engineer.intent); // "feature_implementation"
 console.log(analysis.ceremony.intent); // "co_creation"
 console.log(analysis.storyEngine.intent); // "rising_action"
@@ -1278,7 +1282,7 @@ addBeat(state, beat);
 
 console.log(`Act: ${state.position.act}`);
 console.log(`Beat count: ${state.position.beatCount}`);
-console.log(`Lead universe: ${state.position.leadUniverse}`);
+console.log(`Lead perspective: ${state.position.leadPerspective}`);
 ```
 
 ### Redis Persistence
@@ -1306,11 +1310,13 @@ await manager.cacheEventAnalysis("event_123", analysis);
 await manager.disconnect();
 ```
 
-## The Three Universes
+<a id="the-three-universes"></a>
 
-The three-universe model from `multiverse_3act`:
+## The Three Perspectives
 
-| Universe | Character | Focus | Keywords |
+The three perspectives from `multiverse_3act`. Each one is a reading of the same event, and the stored values are `engineer`, `ceremony` and `story_engine`:
+
+| Perspective | Character | Focus | Keywords |
 |----------|-----------|-------|----------|
 | **ENGINEER** | Mia (The Builder) | Technical precision | feat:, fix:, refactor |
 | **CEREMONY** | Ava8 (The Keeper) | Relational protocols | together, thanks, collaborate |
@@ -1352,12 +1358,12 @@ Connect to the `@langchain/langchain-narrative-tracing` package:
 
 ```typescript
 import { LangGraphBridge } from "@langchain/langchain-narrative-tracing";
-import { ThreeUniverseProcessor } from "ava-langgraph-narrative-intelligence";
+import { ThreePerspectiveProcessor } from "ava-langgraph-narrative-intelligence";
 
 const bridge = new LangGraphBridge(handler);
 
-const processor = new ThreeUniverseProcessor({
-  tracingCallback: bridge.createThreeUniverseCallback(),
+const processor = new ThreePerspectiveProcessor({
+  tracingCallback: bridge.createThreePerspectiveCallback(),
 });
 
 // All analyses now get traced to Langfuse
@@ -1372,7 +1378,7 @@ const analysis = processor.process(event, "github.push");
 // Main exports
 export {
   // Processing
-  ThreeUniverseProcessor,
+  ThreePerspectiveProcessor,
   NarrativeCoherenceEngine,
   EmotionalBeatClassifierNode,
   
@@ -1381,7 +1387,9 @@ export {
   createUnifiedNarrativeState,
   
   // Types
-  Universe,
+  PerspectiveType,
+  PerspectiveReading,
+  ThreePerspectiveAnalysis,
   NarrativeFunction,
   NarrativePhase,
   GapType,
@@ -1400,6 +1408,10 @@ import * as nodes from "ava-langgraph-narrative-intelligence/nodes";
 import * as integrations from "ava-langgraph-narrative-intelligence/integrations";
 ```
 
+### Earlier names
+
+Earlier releases called the three readings "universes". Those names still work as deprecated aliases: `Universe` (now `PerspectiveType`), `UniversePerspective` (`PerspectiveReading`), `ThreeUniverseAnalysis` (`ThreePerspectiveAnalysis`), `ThreeUniverseState` (`ThreePerspectiveState`), `ThreeUniverseProcessor` (`ThreePerspectiveProcessor`) and their `create*` functions. Records now carry `perspectiveType`, `leadPerspective` and `perspectiveAnalysis`. The Redis readers and `deserializeState` also accept records stored with the old `universe`, `leadUniverse` and `universeAnalysis` keys, and map `engineer-world`, `ceremony-world` and `story-engine-world` to the bare values.
+
 ## Python Parity
 
 This package is a complete TypeScript port of the Python `narrative-intelligence` package, maintaining full feature parity:
@@ -1408,7 +1420,7 @@ This package is a complete TypeScript port of the Python `narrative-intelligence
 |---------------|-------------------|
 | `narrative_intelligence/schemas/unified_state_bridge.py` | `schemas/unified_state_bridge.ts` |
 | `narrative_intelligence/schemas/ncp.py` | `schemas/ncp.ts` |
-| `narrative_intelligence/graphs/three_universe_processor.py` | `graphs/three_universe_processor.ts` |
+| `narrative_intelligence/graphs/three_universe_processor.py` | `graphs/three_perspective_processor.ts` |
 | `narrative_intelligence/graphs/coherence_engine.py` | `graphs/coherence_engine.ts` |
 | `narrative_intelligence/nodes/emotional_classifier.py` | `nodes/emotional_classifier.ts` |
 | `narrative_intelligence/integrations/redis_state.py` | `integrations/redis_state.ts` |
@@ -1429,14 +1441,14 @@ Graph-level orchestration for the Prompt Decomposition Engine (PDE). This packag
 
 ## Overview
 
-The Prompt Decomposition Engine (PDE) orchestrates a multi-stage process for analyzing and decomposing user prompts. It leverages the "Four Directions" metaphor (EAST, SOUTH, WEST, NORTH) to guide the decomposition, integrating insights from the "Three Universes" (Engineer/Mia, Ceremony/Ava8, Story Engine/Miette) for a holistic understanding and generation of an execution plan.
+The Prompt Decomposition Engine (PDE) orchestrates a multi-stage process for analyzing and decomposing user prompts. It leverages the "Four Directions" metaphor (EAST, SOUTH, WEST, NORTH) to guide the decomposition, integrating insights from the three perspectives (Engineer/Mia, Ceremony/Ava8, Story Engine/Miette) for a holistic understanding and generation of an execution plan.
 
 ## Features
 
 -   **`DecompositionGraph`**: Orchestrates the core decomposition pipeline (EAST → SOUTH → WEST → NORTH).
 -   **Optional strategic decomposition**: Selects keyword, semantic, hybrid, or multi-pass decomposition and exposes versioned provenance for downstream graphs.
 -   **PDE lineage storage**: Persists flat artifacts or folder-backed PDE trees with parent-child and runtime provenance.
--   **`PerspectiveAnalyzer`**: Analyzes prompt decompositions through the lenses of Engineer (Mia), Ceremony (Ava8), and Story Engine (Miette) universes, enriching the process with multi-dimensional insights.
+-   **`PerspectiveAnalyzer`**: Reads prompt decompositions from the Engineer (Mia), Ceremony (Ava8), and Story Engine (Miette) perspectives, enriching the process with multi-dimensional insights.
 -   **`CeremonyGate`**: Provides a mechanism for relational accountability, gating execution based on ceremonial requirements and ethical considerations, ensuring thoughtful progression.
 
 ## Installation
@@ -1478,7 +1490,7 @@ console.log("Decomposition Status:", state.status);
 // Analyze through three perspectives
 if (state.decomposition) {
   const perspectives = analyzer.analyze(state.decomposition);
-  console.log("Lead Universe:", perspectives.leadUniverse);
+  console.log("Lead Perspective:", perspectives.leadPerspective);
 
   // Evaluate if ceremony is needed
   const verdict = gate.evaluate(state.decomposition, perspectives);
@@ -1520,9 +1532,11 @@ The PDE process is structured around the "Four Directions," inspired by traditio
 -   **WEST (Validation)**: Checks ceremonial requirements and relational balance – "What needs reflection?"
 -   **NORTH (Action)**: Builds the final action stack – "What executes?"
 
-### The Three Universes of Perspective
+<a id="the-three-universes-of-perspective"></a>
 
-Each decomposition is further enriched by perspectives from three interpretive universes:
+### The Three Perspectives
+
+Each decomposition is further enriched by three perspectives:
 
 -   **Mia (Engineer)**: Focuses on technical feasibility, dependencies, and architectural considerations.
 -   **Ava8 (Ceremony)**: Emphasizes relational accountability, protocols, and governance.
@@ -1530,7 +1544,7 @@ Each decomposition is further enriched by perspectives from three interpretive u
 
 ### Ceremony Gating
 
-The `CeremonyGate` acts as a crucial checkpoint. It evaluates the decomposition and its multi-universe analysis to determine if a "ceremonial pause" or human review is required before proceeding to execution. This ensures that actions are not just technically feasible, but also relationally and ethically sound.
+The `CeremonyGate` acts as a crucial checkpoint. It evaluates the decomposition and its three-perspective analysis to determine if a "ceremonial pause" or human review is required before proceeding to execution. This ensures that actions are not just technically feasible, but also relationally and ethically sound.
 
 ## API Reference
 
@@ -1540,7 +1554,7 @@ Consult the JSDoc comments within the source code for detailed API documentation
 
 -   `DecompositionGraph`: The orchestrator for the decomposition pipeline.
 -   `DecompositionWithProvenance`: Stable decomposition plus strategy metadata handoff.
--   `PerspectiveAnalyzer`: Tool for analyzing prompts through three universe lenses.
+-   `PerspectiveAnalyzer`: Tool for reading prompts from the three perspectives. It returns `ThreePerspectiveInsights` with `leadPerspective`, and each `PerspectiveInsight` carries a `perspectiveType`. The earlier names `Universe`, `UNIVERSE_NAMES` and `ThreeUniversePerspective` remain as deprecated aliases of `PerspectiveType`, `PERSPECTIVE_NAMES` and `ThreePerspectiveInsights`.
 -   `CeremonyGate`: Mechanism for evaluating ceremonial requirements and gating execution.
 -   Re-exports from `ava-langchain-prompt-decomposition`: Core primitives like `DirectionalDecomposer`, `IntentExtractor`, `DependencyMapper`, `ActionStackBuilder`, and `MedicineWheelBridge`.
 

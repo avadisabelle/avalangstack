@@ -14,7 +14,7 @@
 
 The **ava-langchain-narrative-tracing** package enables developers to create **narrative-aware observability** across the Narrative Intelligence Stack through:
 
-1. **Semantic Narrative Event Tracing** — Every operation is traced not as a generic span but as a narrative event (beat creation, three-universe analysis, routing decision, story generation lifecycle) with semantic glyphs (📝, 🔍, ✨, 📖) that make traces human-readable
+1. **Semantic Narrative Event Tracing** — Every operation is traced not as a generic span but as a narrative event (beat creation, three-perspective analysis, routing decision, story generation lifecycle) with semantic glyphs (📝, 🔍, ✨, 📖) that make traces human-readable
 
 2. **Cross-System Trace Correlation** — A single story generation spans LangGraph, Flowise, Langflow, and the Storytelling system. The orchestrator correlates traces across boundaries using `X-Narrative-Trace-Id`, `X-Session-Id`, and `X-Story-Id` headers
 
@@ -26,7 +26,7 @@ The **ava-langchain-narrative-tracing** package enables developers to create **n
 
 ### Success Indicators
 
-- ✅ A developer can create a `NarrativeTracingHandler({ storyId })` and call `startStoryGeneration()`, `logBeatCreation()`, `logThreeUniverseAnalysis()`, `logRoutingDecision()`, and `endStoryGeneration()` to trace an entire story generation lifecycle
+- ✅ A developer can create a `NarrativeTracingHandler({ storyId })` and call `startStoryGeneration()`, `logBeatCreation()`, `logThreePerspectiveAnalysis()`, `logRoutingDecision()`, and `endStoryGeneration()` to trace an entire story generation lifecycle
 - ✅ The `NarrativeTraceOrchestrator` correlates traces across system boundaries via `injectCorrelationHeader()` and `extractCorrelationHeader()`
 - ✅ `NarrativeTraceFormatter.formatForDisplay()` produces human-readable trace output with `arcToAsciiChart()` story arc visualization
 - ✅ Adapter bridges (PromptDecompositionBridge, RelationalIntelligenceBridge, LangGraphBridge) emit typed events without requiring traced components to import Langfuse
@@ -43,7 +43,7 @@ The **ava-langchain-narrative-tracing** package enables developers to create **n
 | `NarrativeTracingHandler` | Langfuse callback handler with semantic span naming, narrative event logging, and story lifecycle tracking | SOUTH |
 | `NarrativeTraceOrchestrator` | Cross-system trace correlation with root trace management, child span creation, and header injection/extraction | SOUTH |
 | `NarrativeTraceFormatter` | Human-readable trace formatting with `FormattedSpan` tree rendering and ASCII story arc visualization | WEST |
-| `NarrativeEventType` | 35+ semantic event types spanning beat lifecycle, story lifecycle, three-universe analysis, character/theme events, routing, gap analysis, PDE events, and RI events | EAST |
+| `NarrativeEventType` | 35+ semantic event types spanning beat lifecycle, story lifecycle, three-perspective analysis, character/theme events, routing, gap analysis, PDE events, and RI events | EAST |
 | `EVENT_GLYPHS` | Glyph mapping for human-readable event display | EAST |
 | `NarrativeSpan` / `TraceCorrelation` / `NarrativeMetrics` | Core data structures for narrative-aware spans, cross-system correlation, and quality metrics | SOUTH |
 | Adapter Bridges | `PromptDecompositionBridge`, `RelationalIntelligenceBridge`, `LangGraphBridge`, `MiadiIntegration`, `StorytellingHooks` | Integration |
@@ -85,7 +85,7 @@ class NarrativeTracingHandler {
 
   startStoryGeneration(): void;
   logBeatCreation(beatId: string, content: string, sequence: number, phase: string): void;
-  logThreeUniverseAnalysis(analysis: Record<string, unknown>): void;
+  logThreePerspectiveAnalysis(analysis: Record<string, unknown>): void;
   logRoutingDecision(decision: Record<string, unknown>): void;
   endStoryGeneration(totalMs: number): void;
 }
@@ -174,8 +174,9 @@ enum NarrativeEventType {
   STORY_GENERATION_START = "narrative.story.generation_start",
   STORY_GENERATION_END = "narrative.story.generation_end",
 
-  // Three-universe analysis
-  THREE_UNIVERSE_ANALYSIS = "narrative.three_universe.analysis",
+  // Three-perspective analysis
+  THREE_PERSPECTIVE_ANALYSIS = "narrative.three_perspective.analysis",
+  PERSPECTIVE_SHIFT = "narrative.three_perspective.shift",
 
   // PDE events
   PROMPT_DECOMPOSITION_STARTED = "pde.decomposition.started",
@@ -270,7 +271,7 @@ This library serves as the **observability layer** consumed across the entire Na
 | `NarrativeEventType` (PDE events) | `ava-langchain-prompt-decomposition` → `rispecs/prompt-decomposition/prompt-decomposition.spec.md` | Sibling (Adapter Bridge) | PromptDecompositionBridge traces every PDE pipeline stage as typed narrative events |
 | `NarrativeEventType` (RI events) | `ava-langchain-relational-intelligence` → `rispecs/relational-intelligence/relational-intelligence.spec.md` | Sibling (Adapter Bridge) | RelationalIntelligenceBridge traces wheel assessments, spiral circles, value gate verdicts |
 | Cross-system correlation | `jgwill/Miadi` → `rispecs/miadi-code/SPEC.md` | Kin (miaco `trace` command — Pattern 9) | Both correlate traces across system boundaries; Miadi uses event-driven patterns that tracing observes |
-| `NarrativeTraceFormatter` | `ava-langgraph-narrative-intelligence` → `rispecs/narrative-intelligence/narrative-intelligence.spec.md` | Complementary (Observability ↔ Analysis) | Tracing provides observability; narrative-intelligence provides analysis. Both use Three-Universe model independently |
+| `NarrativeTraceFormatter` | `ava-langgraph-narrative-intelligence` → `rispecs/narrative-intelligence/narrative-intelligence.spec.md` | Complementary (Observability ↔ Analysis) | Tracing provides observability; narrative-intelligence provides analysis. Both use the three-perspective model independently |
 | `StorytellingHooks` adapter | `jgwill/storytelling` | Kin (Story Generation) | Traces the story generation lifecycle in The Keeper's Chronicles and RAG-powered storytelling |
 
 ---

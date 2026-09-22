@@ -110,7 +110,7 @@ export function createResearchIsCeremonyConstraint(): ValueConstraint {
     "ontology", "epistemology", "axiology", "methodology",
     "research is ceremony", "sean wilson", "land-based",
     "elder", "ancestor", "protocol", "treaty", "sovereignty",
-    "k'é", "kinship",
+    "kinship obligation", "kinship",
   ];
 
   return {

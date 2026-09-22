@@ -25,7 +25,7 @@
  *
  * handler.startStoryGeneration();
  * handler.logBeatCreation(beatId, content, sequence, 'rising_action');
- * handler.logThreeUniverseAnalysis({...});
+ * handler.logThreePerspectiveAnalysis({...});
  * handler.logRoutingDecision({...});
  * handler.endStoryGeneration(totalMs);
  *
@@ -57,6 +57,10 @@ export {
   serializeTraceCorrelation,
   createNarrativeMetrics,
   calculateOverallQuality,
+  isThreePerspectiveAnalysisEvent,
+  normalizePerspectiveValue,
+  getSpanLeadPerspective,
+  getCrossPerspectiveCoherence,
 } from "./event_types.js";
 
 // Handler

@@ -129,7 +129,7 @@ describe("NarrativeTraceFormatter", () => {
           createMockSpan({
             beatId: "beat_001",
             emotionalTone: "tension",
-            leadUniverse: "story_engine",
+            leadPerspective: "story_engine",
           }),
         ],
       });
@@ -138,7 +138,22 @@ describe("NarrativeTraceFormatter", () => {
 
       expect(output).toContain("beat: beat_001");
       expect(output).toContain("emotion: tension");
-      expect(output).toContain("universe: story_engine");
+      expect(output).toContain("perspective: story_engine");
+    });
+
+    it("should read the legacy leadUniverse key on stored spans", () => {
+      const trace = createMockCompletedTrace({
+        spans: [
+          createMockSpan({
+            beatId: "beat_002",
+            leadUniverse: "ceremony",
+          }),
+        ],
+      });
+
+      const output = formatter.formatAsTimeline(trace);
+
+      expect(output).toContain("perspective: ceremony");
     });
   });
 
@@ -240,13 +255,13 @@ describe("NarrativeTraceFormatter", () => {
       expect(suggestions.some((s) => s.includes("Emotional arc"))).toBe(true);
     });
 
-    it("should suggest three-universe improvements when misaligned", () => {
+    it("should suggest three-perspective improvements when misaligned", () => {
       const metrics = createNarrativeMetrics();
-      metrics.crossUniverseCoherence = 0.3;
+      metrics.crossPerspectiveCoherence = 0.3;
 
       const suggestions = formatter.generateImprovementSuggestions(metrics);
 
-      expect(suggestions.some((s) => s.includes("Three-universe"))).toBe(true);
+      expect(suggestions.some((s) => s.includes("Three-perspective"))).toBe(true);
     });
 
     it("should suggest enrichment when few beats enriched", () => {
@@ -286,7 +301,7 @@ describe("NarrativeTraceFormatter", () => {
       metrics.coherenceScore = 0.9;
       metrics.emotionalArcStrength = 0.8;
       metrics.themeClarity = 0.85;
-      metrics.crossUniverseCoherence = 0.9;
+      metrics.crossPerspectiveCoherence = 0.9;
       metrics.beatsGenerated = 10;
       metrics.enrichmentsApplied = 5;
       metrics.averageBeatTimeMs = 2000;

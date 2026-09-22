@@ -13,6 +13,7 @@ import {
   createNarrativeMetrics,
   TraceCorrelation,
   createTraceCorrelation,
+  normalizePerspectiveValue,
 } from "./event_types.js";
 
 // Optional Langfuse import
@@ -38,7 +39,7 @@ export interface NarrativeTracingHandlerOptions {
  * Langfuse callback handler with narrative awareness.
  *
  * This handler extends standard tracing with narrative-specific
- * event types, semantic naming, and three-universe perspective tracking.
+ * event types, semantic naming, and three-perspective tracking.
  *
  * @example
  * ```typescript
@@ -51,7 +52,7 @@ export interface NarrativeTracingHandlerOptions {
  *
  * // Log narrative events
  * handler.logBeatCreation('beat_1', 'content', 1, 'rising_action');
- * handler.logThreeUniverseAnalysis({...});
+ * handler.logThreePerspectiveAnalysis({...});
  * ```
  */
 export class NarrativeTracingHandler {
@@ -185,8 +186,13 @@ export class NarrativeTracingHandler {
     beatId?: string;
     characterIds?: string[];
     emotionalTone?: string;
+    leadPerspective?: string;
+    /** @deprecated use leadPerspective */
     leadUniverse?: string;
   }): string {
+    const leadPerspective = normalizePerspectiveValue(
+      options.leadPerspective ?? options.leadUniverse
+    );
     const traceId = this._ensureRootTrace();
     const trace = this.traceObjects.get(traceId);
 
@@ -201,8 +207,8 @@ export class NarrativeTracingHandler {
     // Add context to name
     if (options.beatId) {
       name = `${name} (${options.beatId})`;
-    } else if (options.leadUniverse) {
-      name = `${name} (${options.leadUniverse})`;
+    } else if (leadPerspective) {
+      name = `${name} (${leadPerspective})`;
     }
 
     // Create span
@@ -217,7 +223,7 @@ export class NarrativeTracingHandler {
         beat_id: options.beatId,
         character_ids: options.characterIds || [],
         emotional_tone: options.emotionalTone,
-        lead_universe: options.leadUniverse,
+        lead_perspective: leadPerspective,
         ...(options.metadata || {}),
       },
       parentObservationId: options.parentSpanId,
@@ -328,13 +334,14 @@ export class NarrativeTracingHandler {
   }
 
   // ===========================================================================
-  // THREE-UNIVERSE EVENTS
+  // THREE-PERSPECTIVE EVENTS
   // ===========================================================================
 
   /**
-   * Log three-universe analysis of an event
+   * Log the three-perspective analysis of an event (engineer, ceremony and
+   * story_engine readings, the lead perspective and their coherence).
    */
-  logThreeUniverseAnalysis(options: {
+  logThreePerspectiveAnalysis(options: {
     eventId: string;
     engineerIntent: string;
     engineerConfidence: number;
@@ -342,10 +349,16 @@ export class NarrativeTracingHandler {
     ceremonyConfidence: number;
     storyEngineIntent: string;
     storyEngineConfidence: number;
-    leadUniverse: string;
+    leadPerspective?: string;
+    /** @deprecated use leadPerspective */
+    leadUniverse?: string;
     coherenceScore: number;
     parentSpanId?: string;
   }): string {
+    const leadPerspective = normalizePerspectiveValue(
+      options.leadPerspective ?? options.leadUniverse
+    );
+
     // Update metrics
     this._metrics.engineerAlignment =
       this._metrics.engineerAlignment * 0.9 + options.engineerConfidence * 0.1;
@@ -354,11 +367,11 @@ export class NarrativeTracingHandler {
     this._metrics.storyEngineAlignment =
       this._metrics.storyEngineAlignment * 0.9 +
       options.storyEngineConfidence * 0.1;
-    this._metrics.crossUniverseCoherence =
-      this._metrics.crossUniverseCoherence * 0.9 + options.coherenceScore * 0.1;
+    this._metrics.crossPerspectiveCoherence =
+      this._metrics.crossPerspectiveCoherence * 0.9 + options.coherenceScore * 0.1;
 
     return this.logEvent({
-      eventType: NarrativeEventType.THREE_UNIVERSE_ANALYSIS,
+      eventType: NarrativeEventType.THREE_PERSPECTIVE_ANALYSIS,
       inputData: {
         event_id: options.eventId,
       },
@@ -375,13 +388,22 @@ export class NarrativeTracingHandler {
           intent: options.storyEngineIntent,
           confidence: options.storyEngineConfidence,
         },
-        lead_universe: options.leadUniverse,
+        lead_perspective: leadPerspective,
         coherence_score: options.coherenceScore,
       },
-      leadUniverse: options.leadUniverse,
+      leadPerspective,
       metadata: { coherence_score: options.coherenceScore },
       parentSpanId: options.parentSpanId,
     });
+  }
+
+  /**
+   * @deprecated use logThreePerspectiveAnalysis
+   */
+  logThreeUniverseAnalysis(
+    options: Parameters<NarrativeTracingHandler["logThreePerspectiveAnalysis"]>[0]
+  ): string {
+    return this.logThreePerspectiveAnalysis(options);
   }
 
   // ===========================================================================
@@ -435,6 +457,8 @@ export class NarrativeTracingHandler {
     flow: string;
     score: number;
     method?: string;
+    leadPerspective?: string;
+    /** @deprecated use leadPerspective */
     leadUniverse?: string;
     narrativeAct?: number;
     narrativePhase?: string;
@@ -443,13 +467,16 @@ export class NarrativeTracingHandler {
     parentSpanId?: string;
   }): string {
     this._metrics.routingDecisions += 1;
+    const leadPerspective = normalizePerspectiveValue(
+      options.leadPerspective ?? options.leadUniverse
+    );
 
     return this.logEvent({
       eventType: NarrativeEventType.ROUTING_DECISION,
       inputData: {
         decision_id: options.decisionId,
         method: options.method || "narrative",
-        lead_universe: options.leadUniverse,
+        lead_perspective: leadPerspective,
         narrative_position: {
           act: options.narrativeAct,
           phase: options.narrativePhase,
@@ -462,7 +489,7 @@ export class NarrativeTracingHandler {
         success: options.success ?? true,
         latency_ms: options.latencyMs || 0,
       },
-      leadUniverse: options.leadUniverse,
+      leadPerspective,
       metadata: {
         backend: options.backend,
         flow: options.flow,

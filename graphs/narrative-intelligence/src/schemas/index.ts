@@ -5,12 +5,12 @@
 // Unified State Bridge
 export {
   // Enums
-  Universe,
+  PerspectiveType,
   NarrativePhase,
   NarrativeFunction,
   // Interfaces
-  UniversePerspective,
-  ThreeUniverseAnalysis,
+  PerspectiveReading,
+  ThreePerspectiveAnalysis,
   NarrativePosition,
   StoryBeat,
   CharacterState,
@@ -18,8 +18,8 @@ export {
   RoutingDecision,
   UnifiedNarrativeState,
   // Factory functions
-  createUniversePerspective,
-  createThreeUniverseAnalysis,
+  createPerspectiveReading,
+  createThreePerspectiveAnalysis,
   getPerspective,
   createNarrativePosition,
   createStoryBeat,
@@ -44,6 +44,19 @@ export {
   RedisKeys,
   serializeState,
   deserializeState,
+  // Readers for stored records (accept pre-rename keys)
+  normalizePerspectiveType,
+  normalizePerspectiveReading,
+  normalizeThreePerspectiveAnalysis,
+  normalizeStoryBeat,
+  normalizeRoutingDecision,
+  normalizeUnifiedNarrativeState,
+  // Deprecated aliases (pre-rename names)
+  Universe,
+  UniversePerspective,
+  ThreeUniverseAnalysis,
+  createUniversePerspective,
+  createThreeUniverseAnalysis,
 } from "./unified_state_bridge.js";
 
 // NCP types

@@ -19,8 +19,18 @@ export enum NarrativeEventType {
   STORY_GENERATION_END = "narrative.story.generation_end",
   STORY_QUALITY_METRICS = "narrative.story.quality_metrics",
 
-  // Three-universe analysis
+  // Three-perspective analysis (engineer / ceremony / story_engine readings of one event)
+  THREE_PERSPECTIVE_ANALYSIS = "narrative.three_perspective.analysis",
+  PERSPECTIVE_SHIFT = "narrative.three_perspective.shift",
+  /**
+   * @deprecated use THREE_PERSPECTIVE_ANALYSIS. Keeps the value that spans
+   * recorded before the perspective rename carry, so readers can match it.
+   */
   THREE_UNIVERSE_ANALYSIS = "narrative.three_universe.analysis",
+  /**
+   * @deprecated use PERSPECTIVE_SHIFT. Keeps the value written before the
+   * perspective rename.
+   */
   UNIVERSE_PERSPECTIVE_SHIFT = "narrative.three_universe.perspective_shift",
 
   // Character arc events
@@ -79,6 +89,8 @@ export const EVENT_GLYPHS: Record<NarrativeEventType, string> = {
   [NarrativeEventType.STORY_GENERATION_START]: "📖",
   [NarrativeEventType.STORY_GENERATION_END]: "📕",
   [NarrativeEventType.STORY_QUALITY_METRICS]: "📊",
+  [NarrativeEventType.THREE_PERSPECTIVE_ANALYSIS]: "🌌",
+  [NarrativeEventType.PERSPECTIVE_SHIFT]: "🔄",
   [NarrativeEventType.THREE_UNIVERSE_ANALYSIS]: "🌌",
   [NarrativeEventType.UNIVERSE_PERSPECTIVE_SHIFT]: "🔄",
   [NarrativeEventType.CHARACTER_ARC_UPDATED]: "🎭",
@@ -129,6 +141,11 @@ export interface NarrativeSpan {
   beatId?: string;
   characterIds: string[];
   emotionalTone?: string;
+  leadPerspective?: string;
+  /**
+   * @deprecated legacy key on spans recorded before the perspective rename.
+   * Read the lead with {@link getSpanLeadPerspective}, which accepts both.
+   */
   leadUniverse?: string;
 
   // Timing
@@ -157,12 +174,59 @@ export function createNarrativeSpan(
     sessionId: string;
   }
 ): NarrativeSpan {
-  return {
+  const { leadUniverse, ...rest } = partial;
+  const span: NarrativeSpan = {
     characterIds: [],
     startTime: new Date().toISOString(),
     success: true,
-    ...partial,
+    ...rest,
   };
+  // Accept the legacy key, write the new one.
+  const lead = rest.leadPerspective ?? leadUniverse;
+  if (lead !== undefined) {
+    span.leadPerspective = lead;
+  }
+  return span;
+}
+
+/**
+ * Event types that mark a three-perspective analysis: the current value and
+ * the legacy `narrative.three_universe.analysis` value found on older spans.
+ */
+export function isThreePerspectiveAnalysisEvent(eventType: string): boolean {
+  return (
+    eventType === NarrativeEventType.THREE_PERSPECTIVE_ANALYSIS ||
+    eventType === NarrativeEventType.THREE_UNIVERSE_ANALYSIS
+  );
+}
+
+/**
+ * Legacy spellings of the perspective values, mapped to the bare values.
+ */
+const LEGACY_PERSPECTIVE_VALUES: Record<string, string> = {
+  "engineer-world": "engineer",
+  "ceremony-world": "ceremony",
+  "story-engine-world": "story_engine",
+};
+
+/**
+ * Map a perspective value to its stored bare form (`engineer`, `ceremony`,
+ * `story_engine`). The legacy `engineer-world`, `ceremony-world` and
+ * `story-engine-world` forms are mapped. Other values pass through unchanged.
+ */
+export function normalizePerspectiveValue(value: string): string;
+export function normalizePerspectiveValue(value: string | undefined): string | undefined;
+export function normalizePerspectiveValue(value: string | undefined): string | undefined {
+  if (value === undefined) return undefined;
+  return LEGACY_PERSPECTIVE_VALUES[value] ?? value;
+}
+
+/**
+ * Lead perspective of a span. Accepts `leadPerspective` and the legacy
+ * `leadUniverse` key, and maps legacy value spellings to the bare values.
+ */
+export function getSpanLeadPerspective(span: NarrativeSpan): string | undefined {
+  return normalizePerspectiveValue(span.leadPerspective ?? span.leadUniverse);
 }
 
 /**
@@ -238,11 +302,16 @@ export interface NarrativeMetrics {
   themeClarity: number;
   characterArcCompletion: Record<string, number>;
 
-  // Three-universe alignment (0-1)
+  // Three-perspective alignment (0-1)
   engineerAlignment: number;
   ceremonyAlignment: number;
   storyEngineAlignment: number;
-  crossUniverseCoherence: number;
+  crossPerspectiveCoherence: number;
+  /**
+   * @deprecated legacy key on metrics recorded before the perspective rename.
+   * Read the value with {@link getCrossPerspectiveCoherence}, which accepts both.
+   */
+  crossUniverseCoherence?: number;
 
   // Timing
   totalGenerationTimeMs: number;
@@ -265,10 +334,18 @@ export function createNarrativeMetrics(): NarrativeMetrics {
     engineerAlignment: 0.5,
     ceremonyAlignment: 0.5,
     storyEngineAlignment: 0.5,
-    crossUniverseCoherence: 0.5,
+    crossPerspectiveCoherence: 0.5,
     totalGenerationTimeMs: 0,
     averageBeatTimeMs: 0,
   };
+}
+
+/**
+ * Cross-perspective coherence from metrics. Accepts `crossPerspectiveCoherence`
+ * and the legacy `crossUniverseCoherence` key.
+ */
+export function getCrossPerspectiveCoherence(metrics: NarrativeMetrics): number {
+  return metrics.crossPerspectiveCoherence ?? metrics.crossUniverseCoherence ?? 0.5;
 }
 
 /**
@@ -279,7 +356,7 @@ export function calculateOverallQuality(metrics: NarrativeMetrics): number {
     coherence: 0.25,
     emotionalArc: 0.2,
     themeClarity: 0.15,
-    crossUniverse: 0.2,
+    crossPerspective: 0.2,
     characterArc: 0.2,
   };
 
@@ -294,7 +371,7 @@ export function calculateOverallQuality(metrics: NarrativeMetrics): number {
     metrics.coherenceScore * weights.coherence +
     metrics.emotionalArcStrength * weights.emotionalArc +
     metrics.themeClarity * weights.themeClarity +
-    metrics.crossUniverseCoherence * weights.crossUniverse +
+    getCrossPerspectiveCoherence(metrics) * weights.crossPerspective +
     avgCharacterArc * weights.characterArc
   );
 }

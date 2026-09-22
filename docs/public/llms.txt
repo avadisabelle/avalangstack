@@ -10,6 +10,6 @@ Source: https://github.com/avadisabelle/avalangstack — docs: https://avalangst
 - ava-langchain-state-machine-spec (0.1.11): State Machine Specification layer for LangGraph - declarative workflow specs with formal validation, relational accountability, and Mermaid visualization
 
 ## Graphs
-- ava-langgraph-narrative-intelligence (0.2.1): Narrative Intelligence Toolkit for LangGraph.js - Three-universe processing and NCP analysis
-- ava-langgraph-prompt-decomposition-engine (0.2.1): Prompt Decomposition Engine for LangGraph.js - Graph-level orchestration of Four Directions analysis, three-universe perspective processing, and ceremony gating
+- ava-langgraph-narrative-intelligence (0.2.1): Narrative Intelligence Toolkit for LangGraph.js - Three-perspective processing and NCP analysis
+- ava-langgraph-prompt-decomposition-engine (0.2.1): Prompt Decomposition Engine for LangGraph.js - Graph-level orchestration of Four Directions analysis, three-perspective processing, and ceremony gating
 - ava-langgraph-inquiry-routing-engine (0.2.1): Inquiry Routing Engine for LangGraph.js — Graph-level orchestration of PDE-to-Inquiry pipelines with Four Directions routing, relational accountability gating, and multi-channel dispatch

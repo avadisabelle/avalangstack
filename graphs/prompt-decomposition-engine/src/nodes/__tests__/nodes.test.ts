@@ -1,19 +1,25 @@
 import { describe, it, expect } from "vitest";
-import { PerspectiveAnalyzer, Universe } from "../perspective_nodes.js";
+import {
+  PerspectiveAnalyzer,
+  PerspectiveType,
+  Universe,
+  UNIVERSE_NAMES,
+  PERSPECTIVE_NAMES,
+} from "../perspective_nodes.js";
 import { CeremonyGate, GateDecision } from "../ceremony_gate.js";
 import { decompose } from "ava-langchain-prompt-decomposition";
 
 describe("PerspectiveAnalyzer", () => {
   const analyzer = new PerspectiveAnalyzer();
 
-  it("should analyze a decomposition through three universes", async () => {
+  it("should read a decomposition from three perspectives", async () => {
     const { decomposition } = await decompose(
       "Build a new module and test the integration."
     );
     const perspective = analyzer.analyze(decomposition);
 
     expect(perspective.insights.length).toBe(3);
-    expect(perspective.leadUniverse).toBeDefined();
+    expect(perspective.leadPerspective).toBeDefined();
     expect(perspective.coherence).toBeGreaterThanOrEqual(0);
     expect(perspective.coherence).toBeLessThanOrEqual(1);
     expect(perspective.synthesis).toBeDefined();
@@ -24,7 +30,7 @@ describe("PerspectiveAnalyzer", () => {
       "Build the API module. Implement the schema. Deploy to infrastructure. Debug performance."
     );
     const perspective = analyzer.analyze(decomposition);
-    expect(perspective.insights.find((i) => i.universe === Universe.ENGINEER)?.confidence).toBeGreaterThan(0);
+    expect(perspective.insights.find((i) => i.perspectiveType === PerspectiveType.ENGINEER)?.confidence).toBeGreaterThan(0);
   });
 
   it("should detect ceremony-domain work", async () => {
@@ -32,7 +38,7 @@ describe("PerspectiveAnalyzer", () => {
       "Design the medicine wheel ceremony protocol for indigenous community governance."
     );
     const perspective = analyzer.analyze(decomposition);
-    const ceremony = perspective.insights.find((i) => i.universe === Universe.CEREMONY);
+    const ceremony = perspective.insights.find((i) => i.perspectiveType === PerspectiveType.CEREMONY);
     expect(ceremony?.confidence).toBeGreaterThan(0);
   });
 
@@ -41,8 +47,13 @@ describe("PerspectiveAnalyzer", () => {
       "Build indigenous knowledge graph. Deploy medicine wheel schema."
     );
     const perspective = analyzer.analyze(decomposition);
-    const ceremony = perspective.insights.find((i) => i.universe === Universe.CEREMONY);
+    const ceremony = perspective.insights.find((i) => i.perspectiveType === PerspectiveType.CEREMONY);
     expect(ceremony?.flags.length).toBeGreaterThan(0);
+  });
+
+  it("keeps the deprecated names as aliases", () => {
+    expect(Universe.CEREMONY).toBe(PerspectiveType.CEREMONY);
+    expect(UNIVERSE_NAMES).toBe(PERSPECTIVE_NAMES);
   });
 
   it("should provide synthesis", async () => {

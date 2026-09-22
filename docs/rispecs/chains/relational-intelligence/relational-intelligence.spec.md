@@ -294,7 +294,7 @@ This library is the **foundational relational layer** consumed by all other AvaL
 - `ava-langchain-narrative-tracing` — Provides adapter bridges (`RelationalIntelligenceBridge`) that emit tracing events for every wheel assessment, importance unit lifecycle, spiral circle, and value gate verdict
 - `ava-langchain-state-machine-spec` — Conceptually aligned through relational accountability patterns
 - `ava-langgraph-prompt-decomposition-engine` — Graph layer consumes relational intelligence through the FireKeeper's processPrompt and gateAction flows
-- `ava-langgraph-narrative-intelligence` — Three-Universe Processor aligns with MedicineWheelFilter's multi-perspective assessment pattern
+- `ava-langgraph-narrative-intelligence` — Three-Perspective Processor aligns with MedicineWheelFilter's multi-perspective assessment pattern
 
 ### Dependency Graph
 
@@ -326,7 +326,7 @@ This library is the **foundational relational layer** consumed by all other AvaL
 | `FireKeeper` | `jgwill/medicine-wheel` → `fire-keeper.spec.md` | Direct Ancestor | Coordinating agent protocol with vision alignment and relational milestones |
 | `ImportanceUnit` | `jgwill/medicine-wheel` → `importance-unit.spec.md` | Direct Ancestor | Relational importance with accountability decay and four relational sources |
 | `ValueGate` | `jgwill/medicine-wheel` → `consent-lifecycle.spec.md` | Direct Ancestor | Consent and ceremony gating with constraint severity levels |
-| `MedicineWheelFilter` | `jgwill/Miadi` → `rispecs/miadi-code/SPEC.md` | Kin (Three-Universe Processor) | Three-Universe Processor uses MedicineWheelFilter for multi-perspective assessment |
+| `MedicineWheelFilter` | `jgwill/Miadi` → `rispecs/miadi-code/SPEC.md` | Kin (Three-Perspective Processor) | Three-Perspective Processor uses MedicineWheelFilter for multi-perspective assessment |
 | `FireKeeper` | `ava-langchain-prompt-decomposition` → `rispecs/prompt-decomposition/prompt-decomposition.spec.md` | Sibling (Consumes PDE) | FireKeeper.processPrompt() uses DirectionalDecomposer and IntentExtractor |
 | `ValueGate` | `ava-langchain-narrative-tracing` → `rispecs/narrative-tracing/narrative-tracing.spec.md` | Sibling (Observed by Tracing) | Every gate verdict is traced through RelationalIntelligenceBridge |
 

@@ -15,7 +15,11 @@
 
 import { v4 as uuid } from "uuid";
 import type { NarrativeSpan, TraceCorrelation } from "./event_types.js";
-import { NarrativeEventType, EVENT_GLYPHS } from "./event_types.js";
+import {
+  NarrativeEventType,
+  EVENT_GLYPHS,
+  getSpanLeadPerspective,
+} from "./event_types.js";
 
 // =============================================================================
 // Types
@@ -97,7 +101,9 @@ const EVENT_TYPE_TAGS: Partial<Record<NarrativeEventType, string>> = {
   [NarrativeEventType.BEAT_CREATED]: "beat",
   [NarrativeEventType.STORY_GENERATION_START]: "story-generation",
   [NarrativeEventType.STORY_GENERATION_END]: "story-complete",
-  [NarrativeEventType.THREE_UNIVERSE_ANALYSIS]: "three-universes",
+  [NarrativeEventType.THREE_PERSPECTIVE_ANALYSIS]: "three-perspectives",
+  // Spans recorded before the perspective rename carry the legacy value.
+  [NarrativeEventType.THREE_UNIVERSE_ANALYSIS]: "three-perspectives",
   [NarrativeEventType.CHARACTER_ARC_UPDATED]: "character-arc",
   [NarrativeEventType.THEME_INTRODUCED]: "theme",
   [NarrativeEventType.ROUTING_DECISION]: "routing",
@@ -298,9 +304,10 @@ export class EpisodeBundler {
         tags.add(`tone:${span.emotionalTone}`);
       }
 
-      // Add lead universe if present
-      if (span.leadUniverse) {
-        tags.add(`universe:${span.leadUniverse}`);
+      // Add lead perspective if present
+      const leadPerspective = getSpanLeadPerspective(span);
+      if (leadPerspective) {
+        tags.add(`perspective:${leadPerspective}`);
       }
 
       // Add error tag if failed

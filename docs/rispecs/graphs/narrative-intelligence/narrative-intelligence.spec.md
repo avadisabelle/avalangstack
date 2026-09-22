@@ -1,4 +1,6 @@
-# Narrative Intelligence: Three-Universe Processing Framework
+<a id="narrative-intelligence-three-universe-processing-framework"></a>
+
+# Narrative Intelligence: Three-Perspective Processing Framework
 
 **Specification Type:** Library Specification
 **Document ID:** `rispecs/narrative-intelligence/narrative-intelligence.spec.md`
@@ -12,9 +14,9 @@
 
 ### What Users Want to Create
 
-The **ava-langgraph-narrative-intelligence** package enables developers to create **narrative-aware processing systems** that analyze events through three interpretive universes:
+The **ava-langgraph-narrative-intelligence** package enables developers to create **narrative-aware processing systems** that read events from three perspectives:
 
-1. **Three-Universe Event Processing** — Every event is analyzed through Engineer (Mia — technical precision), Ceremony (Ava8 — relational protocols), and Story Engine (Miette — narrative patterns) perspectives, with lead universe determination and coherence scoring
+1. **Three-Perspective Event Processing** — Every event is read from the Engineer (Mia — technical precision), Ceremony (Ava8 — relational protocols), and Story Engine (Miette — narrative patterns) perspectives, with lead perspective determination and coherence scoring
 
 2. **Narrative Coherence Analysis** — The `NarrativeCoherenceEngine` scores narrative health across structural, thematic, character, sensory, and continuity dimensions, identifies gaps with severity and routing targets, and produces a Trinity assessment (Mia/Miette/Ava8 synthesis)
 
@@ -26,7 +28,7 @@ The **ava-langgraph-narrative-intelligence** package enables developers to creat
 
 ### Success Indicators
 
-- ✅ `ThreeUniverseProcessor.process(event, eventType)` produces a `ThreeUniverseAnalysis` with individual universe perspectives, lead universe, and coherence score
+- ✅ `ThreePerspectiveProcessor.process(event, eventType)` produces a `ThreePerspectiveAnalysis` with one reading per perspective, the lead perspective, and a coherence score
 - ✅ `NarrativeCoherenceEngine.analyze(beats, characters, themes)` produces a `CoherenceResult` with component scores, identified gaps, routing suggestions, and Trinity assessment
 - ✅ `EmotionalBeatClassifierNode.classifyEmotionalTone(content)` returns an `EmotionalTone` with confidence score
 - ✅ `NarrativeRedisManager` persists and retrieves `UnifiedNarrativeState` from Redis, with `MockRedis` enabling testing without infrastructure
@@ -40,7 +42,7 @@ The **ava-langgraph-narrative-intelligence** package enables developers to creat
 
 | Component | Role | Direction |
 |-----------|------|-----------|
-| `ThreeUniverseProcessor` | Processes events through Engineer/Ceremony/Story Engine perspectives with keyword-based intent classification and coherence scoring | EAST |
+| `ThreePerspectiveProcessor` | Reads events from the Engineer/Ceremony/Story Engine perspectives with keyword-based intent classification and coherence scoring | EAST |
 | `NarrativeCoherenceEngine` | Analyzes narrative coherence across five gap types, produces component scores, and generates Trinity assessment | SOUTH |
 | `EmotionalBeatClassifierNode` | Classifies emotional tone of story beats using keyword matching with 10 predefined tones | SOUTH |
 | `UnifiedNarrativeState` / `StoryBeat` / `CharacterState` / `ThematicThread` | Core narrative state schema shared across six systems in the Narrative Intelligence Stack | EAST |
@@ -53,61 +55,65 @@ A system where every event — code commit, agent action, user input — is unde
 
 ### The Tension
 
-The current reality provides complete three-universe processing, coherence analysis, emotional classification, and state management. The creative tension lives in advancing toward **structural thinking** — a four-node graph (picture→draft→review→revise) that ports miaco's `pde-to-st` command into a LangGraph subgraph — and toward **consent-gated episode retrieval** that respects relational accountability when surfacing historical narrative context.
+The current reality provides complete three-perspective processing, coherence analysis, emotional classification, and state management. The creative tension lives in advancing toward **structural thinking** — a four-node graph (picture→draft→review→revise) that ports miaco's `pde-to-st` command into a LangGraph subgraph — and toward **consent-gated episode retrieval** that respects relational accountability when surfacing historical narrative context.
 
 ---
 
 ## Component Specification
 
-### ThreeUniverseProcessor
+<a id="threeuniverseprocessor"></a>
+
+### ThreePerspectiveProcessor
 **Direction:** EAST (Vision / Multi-Perspective Analysis)
 **Type:** Class
-**Purpose:** Processes events through all three universe lenses (Engineer, Ceremony, Story Engine) to produce a unified analysis with lead universe and coherence scoring.
+**Purpose:** Reads events from all three perspectives (Engineer, Ceremony, Story Engine) to produce a unified analysis with the lead perspective and coherence scoring.
 
 ```typescript
-enum Universe {
+enum PerspectiveType {
   ENGINEER = "engineer",     // Mia - The Builder
   CEREMONY = "ceremony",     // Ava8 - The Keeper
   STORY_ENGINE = "story_engine", // Miette - The Weaver
 }
 
-interface UniversePerspective {
-  universe: Universe;
+interface PerspectiveReading {
+  perspectiveType: PerspectiveType;
   intent: string;
   confidence: number;
   suggestedFlows: string[];
   context: Record<string, unknown>;
 }
 
-interface ThreeUniverseAnalysis {
-  engineer: UniversePerspective;
-  ceremony: UniversePerspective;
-  storyEngine: UniversePerspective;
-  leadUniverse: Universe;
+interface ThreePerspectiveAnalysis {
+  engineer: PerspectiveReading;
+  ceremony: PerspectiveReading;
+  storyEngine: PerspectiveReading;
+  leadPerspective: PerspectiveType;
   coherenceScore: number;
   timestamp: string;
 }
 
-interface ThreeUniverseState {
+interface ThreePerspectiveState {
   event: Record<string, unknown>;
   eventType: string;
-  engineerPerspective?: UniversePerspective;
-  ceremonyPerspective?: UniversePerspective;
-  storyEnginePerspective?: UniversePerspective;
-  analysis?: ThreeUniverseAnalysis;
-  leadUniverse?: Universe;
+  engineerPerspective?: PerspectiveReading;
+  ceremonyPerspective?: PerspectiveReading;
+  storyEnginePerspective?: PerspectiveReading;
+  analysis?: ThreePerspectiveAnalysis;
+  leadPerspective?: PerspectiveType;
   coherenceScore?: number;
   error?: string;
 }
 
-class ThreeUniverseProcessor {
-  process(event: ProcessedEvent, eventType: EventType): ThreeUniverseAnalysis;
-  analyzeEngineerPerspective(event: ProcessedEvent): UniversePerspective;
-  analyzeCeremonyPerspective(event: ProcessedEvent): UniversePerspective;
-  analyzeStoryEnginePerspective(event: ProcessedEvent): UniversePerspective;
-  synthesizePerspectives(engineer, ceremony, storyEngine): ThreeUniverseAnalysis;
+class ThreePerspectiveProcessor {
+  process(event: ProcessedEvent, eventType: EventType): ThreePerspectiveAnalysis;
+  analyzeEngineerPerspective(event: ProcessedEvent): PerspectiveReading;
+  analyzeCeremonyPerspective(event: ProcessedEvent): PerspectiveReading;
+  analyzeStoryEnginePerspective(event: ProcessedEvent): PerspectiveReading;
+  synthesizePerspectives(engineer, ceremony, storyEngine): ThreePerspectiveAnalysis;
 }
 ```
+
+Stored perspective values are the bare `engineer`, `ceremony` and `story_engine`. The earlier names (`Universe`, `UniversePerspective`, `ThreeUniverseAnalysis`, `ThreeUniverseState`, `ThreeUniverseProcessor`) remain as deprecated aliases, and readers of stored records accept the earlier keys `universe`, `leadUniverse` and `universeAnalysis`.
 
 ### NarrativeCoherenceEngine
 **Direction:** SOUTH (Analysis / Scoring)
@@ -288,7 +294,7 @@ class MockRedis {
 
 This library has optional peer dependencies on `@langchain/langgraph` and `ioredis`. It does NOT directly depend on the langchainjs custom libraries (relational-intelligence, prompt-decomposition, narrative-tracing) but is **conceptually aligned** through shared patterns:
 
-- The Three-Universe model (Engineer/Ceremony/Story Engine) parallels the Medicine Wheel's multi-perspective approach in relational-intelligence
+- The three-perspective model (Engineer/Ceremony/Story Engine) parallels the Medicine Wheel's multi-perspective approach in relational-intelligence
 - NarrativeCoherenceEngine's gap analysis parallels the ValueGate's constraint checking pattern
 - The `UnifiedNarrativeState` is the shared contract consumed by the Storytelling system, Flowise, Langflow, and Miadi
 
@@ -296,7 +302,7 @@ This library has optional peer dependencies on `@langchain/langgraph` and `iored
 
 ```
         ava-langgraph-narrative-intelligence
-        (ThreeUniverseProcessor, CoherenceEngine,
+        (ThreePerspectiveProcessor, CoherenceEngine,
          EmotionalClassifier, RedisManager, NCP)
                        │
         ┌──────────────┼───────────────────┐
@@ -317,10 +323,10 @@ This library has optional peer dependencies on `@langchain/langgraph` and `iored
 
 | This Package | Related Package | Kinship Type | Shared Pattern |
 |---|---|---|---|
-| `ThreeUniverseProcessor` | `jgwill/Miadi` → `rispecs/miadi-code/SPEC.md` (Three-Universe Terminal Agent) | Direct Kin | Engineer/Ceremony/Story Engine mapping — Mia/Ava8/Miette as three interpretive lenses |
+| `ThreePerspectiveProcessor` | `jgwill/Miadi` → `rispecs/miadi-code/SPEC.md` (Three-Universe Terminal Agent) | Direct Kin | Engineer/Ceremony/Story Engine mapping — Mia/Ava8/Miette as three interpretive lenses |
 | `NarrativeCoherenceEngine` | `jgwill/medicine-wheel` → `narrative-engine.spec.md` | Kin (Narrative Processing) | Both process narrative content through typed pipelines; coherence engine scores what narrative engine produces |
-| `ThreeUniverseProcessor` | `ava-langchain-relational-intelligence` → `rispecs/relational-intelligence/relational-intelligence.spec.md` | Conceptual Sibling | Three-Universe multi-perspective analysis parallels MedicineWheelFilter's four-quadrant assessment — both ensure multiple dimensions of reality are engaged |
-| `NarrativeCoherenceEngine` | `ava-langchain-narrative-tracing` → `rispecs/narrative-tracing/narrative-tracing.spec.md` | Complementary (Analysis ↔ Observability) | Intelligence provides analysis; tracing provides observability. Both use Three-Universe model independently |
+| `ThreePerspectiveProcessor` | `ava-langchain-relational-intelligence` → `rispecs/relational-intelligence/relational-intelligence.spec.md` | Conceptual Sibling | Three-perspective analysis parallels MedicineWheelFilter's four-quadrant assessment — both ensure multiple dimensions of reality are engaged |
+| `NarrativeCoherenceEngine` | `ava-langchain-narrative-tracing` → `rispecs/narrative-tracing/narrative-tracing.spec.md` | Complementary (Analysis ↔ Observability) | Intelligence provides analysis; tracing provides observability. Both use the three-perspective model independently |
 | `UnifiedNarrativeState` | `ava-langgraph-prompt-decomposition-engine` → `rispecs/prompt-decomposition-engine/prompt-decomposition-engine.spec.md` | Sibling (State Pattern) | Both define graph state schemas — `DecompositionState` for PDE pipeline, `UnifiedNarrativeState` for narrative lifecycle |
 | `EmotionalBeatClassifierNode` | `ava-langgraph-inquiry-routing-engine` → `rispecs/inquiry-routing-engine/inquiry-routing-engine.spec.md` | Sibling (Classification Pattern) | Both use keyword-based classification nodes — inquiry routing classifies intent, emotional classifier classifies tone |
 
@@ -334,7 +340,7 @@ This library has optional peer dependencies on `@langchain/langgraph` and `iored
 
 2. **EpisodeRetrievalSubgraph** — Create a consent-gated episode retrieval subgraph that surfaces historical narrative context (previous episodes, character arcs, thematic threads) while respecting relational accountability. The retrieval gate checks whether the requesting agent has appropriate relational context before granting access to narrative history.
 
-3. **LLM-Enhanced Three-Universe Processing** — Advance the `ThreeUniverseProcessor` beyond keyword-based intent classification toward LLM-powered perspective analysis where each universe perspective is generated by an LLM prompt tuned for that universe's interpretive lens.
+3. **LLM-Enhanced Three-Perspective Processing** — Advance the `ThreePerspectiveProcessor` beyond keyword-based intent classification toward LLM-powered perspective analysis where each perspective's reading is generated by an LLM prompt tuned for that perspective.
 
 4. **NCP Integration Deepening** — Advance NCP schema toward bidirectional synchronization with the Storytelling system's NCP implementation, enabling real-time narrative state sharing during story generation.
 

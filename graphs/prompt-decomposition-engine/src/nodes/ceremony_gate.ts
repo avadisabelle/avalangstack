@@ -4,12 +4,12 @@
  * Graph-level value gate that checks whether a decomposed prompt
  * can proceed to execution or needs ceremonial pause.
  *
- * Integrates MedicineWheelBridge assessment with Three-Universe
- * perspective analysis to make proceed/hold decisions.
+ * Integrates MedicineWheelBridge assessment with three-perspective
+ * analysis to make proceed/hold decisions.
  */
 
 import type { DecompositionResult } from "ava-langchain-prompt-decomposition";
-import type { ThreeUniversePerspective } from "./perspective_nodes.js";
+import type { ThreePerspectiveInsights } from "./perspective_nodes.js";
 import { CEREMONY_KEYWORDS } from "../constants.js";
 
 // =============================================================================
@@ -59,7 +59,7 @@ export class CeremonyGate {
    */
   evaluate(
     decomposition: DecompositionResult,
-    perspective?: ThreeUniversePerspective
+    perspective?: ThreePerspectiveInsights
   ): CeremonyGateResult {
     const reasons: string[] = [];
     let relationalScore = decomposition.balance;
@@ -95,7 +95,7 @@ export class CeremonyGate {
 
       if (perspective.coherence < this.coherenceThreshold) {
         reasons.push(
-          `Three-universe coherence (${(perspective.coherence * 100).toFixed(0)}%) below threshold`
+          `Three-perspective coherence (${(perspective.coherence * 100).toFixed(0)}%) below threshold`
         );
       }
 
@@ -145,7 +145,7 @@ export class CeremonyGate {
    */
   canProceed(
     decomposition: DecompositionResult,
-    perspective?: ThreeUniversePerspective
+    perspective?: ThreePerspectiveInsights
   ): boolean {
     const result = this.evaluate(decomposition, perspective);
     return result.decision !== GateDecision.HOLD;

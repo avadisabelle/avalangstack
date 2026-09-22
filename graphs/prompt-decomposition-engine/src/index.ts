@@ -6,7 +6,7 @@
  * this package provides:
  *
  * - DecompositionGraph: State-based graph running EAST→SOUTH→WEST→NORTH
- * - PerspectiveAnalyzer: Three-universe analysis (Mia/Ava8/Miette)
+ * - PerspectiveAnalyzer: Three-perspective analysis (Mia/Ava8/Miette)
  * - CeremonyGate: Relational accountability gating
  *
  * @example
@@ -64,11 +64,15 @@ export {
 // =============================================================================
 
 export {
+  PerspectiveType,
+  PERSPECTIVE_NAMES,
+  PerspectiveInsight,
+  ThreePerspectiveInsights,
+  PerspectiveAnalyzer,
+  // Deprecated aliases (pre-rename names)
   Universe,
   UNIVERSE_NAMES,
-  PerspectiveInsight,
   ThreeUniversePerspective,
-  PerspectiveAnalyzer,
   GateDecision,
   CeremonyGateResult,
   CeremonyGateOptions,

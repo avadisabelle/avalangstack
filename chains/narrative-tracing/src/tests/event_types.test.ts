@@ -7,6 +7,10 @@ import {
   addChildTrace,
   createNarrativeMetrics,
   calculateOverallQuality,
+  isThreePerspectiveAnalysisEvent,
+  getSpanLeadPerspective,
+  getCrossPerspectiveCoherence,
+  normalizePerspectiveValue,
 } from "../event_types.js";
 
 describe("NarrativeEventType", () => {
@@ -17,8 +21,11 @@ describe("NarrativeEventType", () => {
     expect(NarrativeEventType.STORY_GENERATION_START).toBe(
       "narrative.story.generation_start"
     );
-    expect(NarrativeEventType.THREE_UNIVERSE_ANALYSIS).toBe(
-      "narrative.three_universe.analysis"
+    expect(NarrativeEventType.THREE_PERSPECTIVE_ANALYSIS).toBe(
+      "narrative.three_perspective.analysis"
+    );
+    expect(NarrativeEventType.PERSPECTIVE_SHIFT).toBe(
+      "narrative.three_perspective.shift"
     );
     expect(NarrativeEventType.ROUTING_DECISION).toBe(
       "narrative.routing.decision"
@@ -35,7 +42,7 @@ describe("NarrativeEventType", () => {
 
   it("should have meaningful glyphs", () => {
     expect(EVENT_GLYPHS[NarrativeEventType.BEAT_CREATED]).toBe("📝");
-    expect(EVENT_GLYPHS[NarrativeEventType.THREE_UNIVERSE_ANALYSIS]).toBe("🌌");
+    expect(EVENT_GLYPHS[NarrativeEventType.THREE_PERSPECTIVE_ANALYSIS]).toBe("🌌");
     expect(EVENT_GLYPHS[NarrativeEventType.ROUTING_DECISION]).toBe("🚀");
     expect(EVENT_GLYPHS[NarrativeEventType.GAP_REMEDIATED]).toBe("🔧");
   });
@@ -127,7 +134,7 @@ describe("NarrativeMetrics", () => {
     expect(metrics.coherenceScore).toBe(0.5);
     expect(metrics.emotionalArcStrength).toBe(0.5);
     expect(metrics.themeClarity).toBe(0.5);
-    expect(metrics.crossUniverseCoherence).toBe(0.5);
+    expect(metrics.crossPerspectiveCoherence).toBe(0.5);
     expect(metrics.characterArcCompletion).toEqual({});
   });
 
@@ -136,7 +143,7 @@ describe("NarrativeMetrics", () => {
     metrics.coherenceScore = 0.8;
     metrics.emotionalArcStrength = 0.7;
     metrics.themeClarity = 0.6;
-    metrics.crossUniverseCoherence = 0.9;
+    metrics.crossPerspectiveCoherence = 0.9;
     metrics.characterArcCompletion = {
       char_1: 0.8,
       char_2: 0.6,
@@ -154,7 +161,7 @@ describe("NarrativeMetrics", () => {
     metrics.coherenceScore = 1.0;
     metrics.emotionalArcStrength = 1.0;
     metrics.themeClarity = 1.0;
-    metrics.crossUniverseCoherence = 1.0;
+    metrics.crossPerspectiveCoherence = 1.0;
 
     const quality = calculateOverallQuality(metrics);
 
@@ -177,9 +184,9 @@ describe("Event type coverage", () => {
     expect(EVENT_GLYPHS[NarrativeEventType.STORY_QUALITY_METRICS]).toBeDefined();
   });
 
-  it("should have glyphs for three-universe events", () => {
-    expect(EVENT_GLYPHS[NarrativeEventType.THREE_UNIVERSE_ANALYSIS]).toBeDefined();
-    expect(EVENT_GLYPHS[NarrativeEventType.UNIVERSE_PERSPECTIVE_SHIFT]).toBeDefined();
+  it("should have glyphs for three-perspective events", () => {
+    expect(EVENT_GLYPHS[NarrativeEventType.THREE_PERSPECTIVE_ANALYSIS]).toBeDefined();
+    expect(EVENT_GLYPHS[NarrativeEventType.PERSPECTIVE_SHIFT]).toBeDefined();
   });
 
   it("should have glyphs for character events", () => {
@@ -195,5 +202,72 @@ describe("Event type coverage", () => {
   it("should have glyphs for gap events", () => {
     expect(EVENT_GLYPHS[NarrativeEventType.GAP_IDENTIFIED]).toBeDefined();
     expect(EVENT_GLYPHS[NarrativeEventType.GAP_REMEDIATED]).toBeDefined();
+  });
+});
+
+describe("Legacy perspective names on stored spans and metrics", () => {
+  it("keeps the legacy event-type values for readers", () => {
+    expect(NarrativeEventType.THREE_UNIVERSE_ANALYSIS).toBe(
+      "narrative.three_universe.analysis"
+    );
+    expect(EVENT_GLYPHS[NarrativeEventType.THREE_UNIVERSE_ANALYSIS]).toBe("🌌");
+    expect(EVENT_GLYPHS[NarrativeEventType.UNIVERSE_PERSPECTIVE_SHIFT]).toBeDefined();
+  });
+
+  it("treats the current and legacy analysis values as one kind", () => {
+    expect(
+      isThreePerspectiveAnalysisEvent("narrative.three_perspective.analysis")
+    ).toBe(true);
+    expect(
+      isThreePerspectiveAnalysisEvent("narrative.three_universe.analysis")
+    ).toBe(true);
+    expect(isThreePerspectiveAnalysisEvent("narrative.beat.created")).toBe(false);
+  });
+
+  it("reads the lead from leadPerspective or the legacy leadUniverse key", () => {
+    const base = {
+      spanId: "s",
+      traceId: "t",
+      eventType: NarrativeEventType.BEAT_CREATED,
+      storyId: "story",
+      sessionId: "session",
+    };
+    expect(
+      getSpanLeadPerspective(createNarrativeSpan({ ...base, leadPerspective: "ceremony" }))
+    ).toBe("ceremony");
+    expect(
+      getSpanLeadPerspective({
+        ...createNarrativeSpan(base),
+        leadUniverse: "engineer",
+      })
+    ).toBe("engineer");
+  });
+
+  it("writes leadPerspective when a span is created from the legacy key", () => {
+    const span = createNarrativeSpan({
+      spanId: "s",
+      traceId: "t",
+      eventType: NarrativeEventType.BEAT_CREATED,
+      storyId: "story",
+      sessionId: "session",
+      leadUniverse: "story_engine",
+    });
+    expect(span.leadPerspective).toBe("story_engine");
+    expect("leadUniverse" in span).toBe(false);
+  });
+
+  it("maps legacy -world values to the bare values", () => {
+    expect(normalizePerspectiveValue("engineer-world")).toBe("engineer");
+    expect(normalizePerspectiveValue("ceremony-world")).toBe("ceremony");
+    expect(normalizePerspectiveValue("story-engine-world")).toBe("story_engine");
+    expect(normalizePerspectiveValue("story_engine")).toBe("story_engine");
+  });
+
+  it("reads cross-perspective coherence from the legacy metrics key", () => {
+    const { crossPerspectiveCoherence: _dropped, ...rest } = createNarrativeMetrics();
+    const legacy = { ...rest, crossUniverseCoherence: 0.9 } as unknown as ReturnType<
+      typeof createNarrativeMetrics
+    >;
+    expect(getCrossPerspectiveCoherence(legacy)).toBe(0.9);
   });
 });

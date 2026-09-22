@@ -30,7 +30,7 @@ Every folder still publishes under the npm name you already install.
 |---|---|---|---|
 | [`prompt-decomposition-engine`](graphs/prompt-decomposition-engine) | `ava-langgraph-prompt-decomposition-engine` | prompt-decomposition, relational-intelligence | Graph-orchestrated prompt decomposition with multi-perspective analysis and ceremony gating |
 | [`inquiry-routing-engine`](graphs/inquiry-routing-engine) | `ava-langgraph-inquiry-routing-engine` | inquiry-routing, prompt-decomposition | Inquiry routing as a LangGraph StateGraph with relational accountability gating |
-| [`narrative-intelligence`](graphs/narrative-intelligence) | `ava-langgraph-narrative-intelligence` | — | Three-universe processing — narrative coherence, emotional beats, unified state |
+| [`narrative-intelligence`](graphs/narrative-intelligence) | `ava-langgraph-narrative-intelligence` | — | Three-perspective processing — narrative coherence, emotional beats, unified state |
 
 While they live here, graphs never take a chain from npm. `pnpm install` links every `ava-langchain-*` range the local chain satisfies, and `pnpm check:consumption` fails when a graph resolves a chain from anywhere but `chains/`. A graph release builds the chains, runs that check, then builds and tests the graphs against them.
 

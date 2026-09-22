@@ -4,11 +4,11 @@
 
 import { describe, it, expect } from "vitest";
 import {
-  Universe,
+  PerspectiveType,
   NarrativePhase,
   NarrativeFunction,
-  createUniversePerspective,
-  createThreeUniverseAnalysis,
+  createPerspectiveReading,
+  createThreePerspectiveAnalysis,
   createNarrativePosition,
   createStoryBeat,
   createCharacterState,
@@ -28,13 +28,20 @@ import {
   RedisKeys,
   serializeState,
   deserializeState,
+  normalizePerspectiveType,
+  normalizeThreePerspectiveAnalysis,
+  normalizeStoryBeat,
+  normalizeRoutingDecision,
+  Universe,
+  createUniversePerspective,
+  createThreeUniverseAnalysis,
 } from "../schemas/unified_state_bridge.js";
 
-describe("Universe enum", () => {
-  it("should have three universes", () => {
-    expect(Universe.ENGINEER).toBe("engineer");
-    expect(Universe.CEREMONY).toBe("ceremony");
-    expect(Universe.STORY_ENGINE).toBe("story_engine");
+describe("PerspectiveType enum", () => {
+  it("should have three perspectives", () => {
+    expect(PerspectiveType.ENGINEER).toBe("engineer");
+    expect(PerspectiveType.CEREMONY).toBe("ceremony");
+    expect(PerspectiveType.STORY_ENGINE).toBe("story_engine");
   });
 });
 
@@ -55,15 +62,15 @@ describe("NarrativeFunction enum", () => {
   });
 });
 
-describe("createUniversePerspective", () => {
+describe("createPerspectiveReading", () => {
   it("should create a perspective with required fields", () => {
-    const perspective = createUniversePerspective(
-      Universe.ENGINEER,
+    const perspective = createPerspectiveReading(
+      PerspectiveType.ENGINEER,
       "feature_implementation",
       0.85
     );
 
-    expect(perspective.universe).toBe(Universe.ENGINEER);
+    expect(perspective.perspectiveType).toBe(PerspectiveType.ENGINEER);
     expect(perspective.intent).toBe("feature_implementation");
     expect(perspective.confidence).toBe(0.85);
     expect(perspective.suggestedFlows).toEqual([]);
@@ -71,8 +78,8 @@ describe("createUniversePerspective", () => {
   });
 
   it("should accept optional fields", () => {
-    const perspective = createUniversePerspective(
-      Universe.CEREMONY,
+    const perspective = createPerspectiveReading(
+      PerspectiveType.CEREMONY,
       "co_creation",
       0.9,
       {
@@ -89,28 +96,28 @@ describe("createUniversePerspective", () => {
   });
 });
 
-describe("createThreeUniverseAnalysis", () => {
+describe("createThreePerspectiveAnalysis", () => {
   it("should combine three perspectives", () => {
-    const engineer = createUniversePerspective(Universe.ENGINEER, "bug_fix", 0.8);
-    const ceremony = createUniversePerspective(Universe.CEREMONY, "healing", 0.6);
-    const storyEngine = createUniversePerspective(
-      Universe.STORY_ENGINE,
+    const engineer = createPerspectiveReading(PerspectiveType.ENGINEER, "bug_fix", 0.8);
+    const ceremony = createPerspectiveReading(PerspectiveType.CEREMONY, "healing", 0.6);
+    const storyEngine = createPerspectiveReading(
+      PerspectiveType.STORY_ENGINE,
       "resolution",
       0.7
     );
 
-    const analysis = createThreeUniverseAnalysis(
+    const analysis = createThreePerspectiveAnalysis(
       engineer,
       ceremony,
       storyEngine,
-      Universe.ENGINEER,
+      PerspectiveType.ENGINEER,
       0.75
     );
 
     expect(analysis.engineer).toBe(engineer);
     expect(analysis.ceremony).toBe(ceremony);
     expect(analysis.storyEngine).toBe(storyEngine);
-    expect(analysis.leadUniverse).toBe(Universe.ENGINEER);
+    expect(analysis.leadPerspective).toBe(PerspectiveType.ENGINEER);
     expect(analysis.coherenceScore).toBe(0.75);
     expect(analysis.timestamp).toBeDefined();
   });
@@ -131,7 +138,7 @@ describe("createStoryBeat", () => {
     expect(beat.content).toBe("The hero makes a decision");
     expect(beat.narrativeFunction).toBe(NarrativeFunction.TURNING_POINT);
     expect(beat.act).toBe(2);
-    expect(beat.leadUniverse).toBe(Universe.STORY_ENGINE);
+    expect(beat.leadPerspective).toBe(PerspectiveType.STORY_ENGINE);
     expect(beat.emotionalTone).toBe("neutral");
     expect(beat.thematicTags).toEqual([]);
     expect(beat.qualityScore).toBe(0.5);
@@ -304,22 +311,22 @@ describe("Default characters and themes", () => {
 
     expect(characters["the-builder"].name).toBe("Mia");
     expect(characters["the-builder"].archetype).toBe("The Builder");
-    expect(characters["the-builder"].universe).toBe(Universe.ENGINEER);
+    expect(characters["the-builder"].perspectiveType).toBe(PerspectiveType.ENGINEER);
 
     expect(characters["the-keeper"].name).toBe("Ava8");
     expect(characters["the-keeper"].archetype).toBe("The Keeper");
-    expect(characters["the-keeper"].universe).toBe(Universe.CEREMONY);
+    expect(characters["the-keeper"].perspectiveType).toBe(PerspectiveType.CEREMONY);
 
     expect(characters["the-weaver"].name).toBe("Miette");
     expect(characters["the-weaver"].archetype).toBe("The Weaver");
-    expect(characters["the-weaver"].universe).toBe(Universe.STORY_ENGINE);
+    expect(characters["the-weaver"].perspectiveType).toBe(PerspectiveType.STORY_ENGINE);
   });
 
   it("getDefaultThemes should return standard themes", () => {
     const themes = getDefaultThemes();
 
     expect(themes["integration"].name).toBe("Integration Without Extraction");
-    expect(themes["collaboration"].name).toBe("Cross-Universe Collaboration");
+    expect(themes["collaboration"].name).toBe("Cross-Perspective Collaboration");
     expect(themes["coherence"].name).toBe("Narrative Coherence");
   });
 });
@@ -356,5 +363,113 @@ describe("Serialization", () => {
     expect(restored.sessionId).toBe(state.sessionId);
     expect(restored.beats).toHaveLength(1);
     expect(restored.beats[0].id).toBe("beat_1");
+  });
+});
+
+describe("Pre-rename names and stored records", () => {
+  it("keeps the deprecated aliases working", () => {
+    expect(Universe.ENGINEER).toBe(PerspectiveType.ENGINEER);
+    const reading = createUniversePerspective(Universe.CEREMONY, "healing", 0.6);
+    expect(reading.perspectiveType).toBe(PerspectiveType.CEREMONY);
+    const analysis = createThreeUniverseAnalysis(
+      reading,
+      reading,
+      reading,
+      Universe.CEREMONY,
+      0.5
+    );
+    expect(analysis.leadPerspective).toBe(PerspectiveType.CEREMONY);
+  });
+
+  it("maps legacy -world values to the bare values", () => {
+    expect(normalizePerspectiveType("engineer-world")).toBe(PerspectiveType.ENGINEER);
+    expect(normalizePerspectiveType("ceremony-world")).toBe(PerspectiveType.CEREMONY);
+    expect(normalizePerspectiveType("story-engine-world")).toBe(
+      PerspectiveType.STORY_ENGINE
+    );
+    expect(normalizePerspectiveType("story_engine")).toBe(PerspectiveType.STORY_ENGINE);
+    expect(normalizePerspectiveType("unknown")).toBeUndefined();
+  });
+
+  const legacyAnalysis = {
+    engineer: { universe: "engineer", intent: "bug_fix", confidence: 0.8, suggestedFlows: [], context: {}, evidence: [] },
+    ceremony: { universe: "ceremony-world", intent: "healing", confidence: 0.6, suggestedFlows: [], context: {}, evidence: [] },
+    storyEngine: { universe: "story_engine", intent: "resolution", confidence: 0.7, suggestedFlows: [], context: { act: 3 }, evidence: [] },
+    leadUniverse: "engineer",
+    coherenceScore: 0.72,
+    timestamp: "2026-01-01T00:00:00.000Z",
+    leadMargin: 0.1,
+    ambiguous: true,
+  };
+
+  it("reads a stored analysis with legacy keys", () => {
+    const analysis = normalizeThreePerspectiveAnalysis(legacyAnalysis);
+    expect(analysis.leadPerspective).toBe(PerspectiveType.ENGINEER);
+    expect(analysis.ceremony.perspectiveType).toBe(PerspectiveType.CEREMONY);
+    expect(analysis.coherenceScore).toBe(0.72);
+    expect("leadUniverse" in analysis).toBe(false);
+    expect("universe" in analysis.engineer).toBe(false);
+  });
+
+  it("reads a stored beat and routing decision with legacy keys", () => {
+    const beat = normalizeStoryBeat({
+      id: "beat_old",
+      sequence: 1,
+      content: "old beat",
+      narrativeFunction: "resolution",
+      act: 3,
+      universeAnalysis: legacyAnalysis,
+      leadUniverse: "ceremony",
+    });
+    expect(beat.leadPerspective).toBe(PerspectiveType.CEREMONY);
+    expect(beat.perspectiveAnalysis?.leadPerspective).toBe(PerspectiveType.ENGINEER);
+    expect("universeAnalysis" in beat).toBe(false);
+
+    const decision = normalizeRoutingDecision({
+      id: "rd_old",
+      backend: "flowise",
+      flow: "f",
+      universeAnalysis: legacyAnalysis,
+      narrativePosition: { act: 1, leadUniverse: "story_engine" },
+      score: 0.9,
+    });
+    expect(decision.perspectiveAnalysis.coherenceScore).toBe(0.72);
+    expect(decision.narrativePosition.leadPerspective).toBe(
+      PerspectiveType.STORY_ENGINE
+    );
+  });
+
+  it("deserializes a stored state with legacy keys", () => {
+    const state = createUnifiedNarrativeState("story_old", "session_old");
+    const stored = JSON.parse(serializeState(state));
+    // Rewrite the record into its pre-rename shape.
+    stored.position.leadUniverse = stored.position.leadPerspective;
+    delete stored.position.leadPerspective;
+    for (const character of Object.values(stored.characters) as Record<string, unknown>[]) {
+      character.universe = character.perspectiveType;
+      delete character.perspectiveType;
+    }
+    stored.routingDecisions = [
+      { id: "rd_old", universeAnalysis: legacyAnalysis, narrativePosition: stored.position },
+    ];
+
+    const restored = deserializeState(JSON.stringify(stored));
+
+    expect(restored.position.leadPerspective).toBe(PerspectiveType.STORY_ENGINE);
+    expect(restored.characters["the-builder"].perspectiveType).toBe(
+      PerspectiveType.ENGINEER
+    );
+    expect(restored.routingDecisions[0].perspectiveAnalysis.leadPerspective).toBe(
+      PerspectiveType.ENGINEER
+    );
+    expect(calculateCoherence(restored)).toBe(0.72);
+  });
+
+  it("calculateCoherence reads routing decisions held with the legacy key", () => {
+    const state = createUnifiedNarrativeState("story_1", "session_1");
+    state.routingDecisions.push({
+      universeAnalysis: legacyAnalysis,
+    } as unknown as (typeof state.routingDecisions)[number]);
+    expect(calculateCoherence(state)).toBe(0.72);
   });
 });

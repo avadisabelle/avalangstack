@@ -15,14 +15,14 @@
 The **ava-langgraph-prompt-decomposition-engine** enables developers to create **graph-orchestrated prompt decomposition workflows** that:
 
 1. **State-Based Decomposition Graph** — A four-node graph running EAST→SOUTH→WEST→NORTH as a LangGraph-compatible state machine
-2. **Three-Universe Perspective Analysis** — Each decomposition viewed through Mia (Engineer), Ava8 (Ceremony), and Miette (Story Engine) lenses
+2. **Three-Perspective Analysis** — Each decomposition read from the Mia (Engineer), Ava8 (Ceremony), and Miette (Story Engine) perspectives
 3. **Ceremony Gating** — Relational accountability gating that can PROCEED, CAUTION, or HOLD execution based on balance and sacred domain analysis
 4. **Subgraph Composability** — The decomposition graph can be embedded as a subgraph in larger LangGraph workflows
 
 ### Success Indicators
 
 - ✅ `graph.invoke("complex prompt")` produces a fully decomposed state with all four directional analyses
-- ✅ Three-universe perspective reveals blind spots missed by single-lens analysis
+- ✅ Three-perspective analysis reveals blind spots missed by single-perspective analysis
 - ✅ Ceremony gate blocks indigenous/sacred domain work without proper reflective dimension
 - ✅ The engine uses `ava-langchain-prompt-decomposition` primitives (no duplication)
 
@@ -37,7 +37,7 @@ ava-langchain-prompt-decomposition (primitives)
     ↓ consumed by
 ava-langgraph-prompt-decomposition-engine (graph orchestration)
     ├── DecompositionGraph (EAST→SOUTH→WEST→NORTH state machine)
-    ├── PerspectiveAnalyzer (Three-Universe analysis)
+    ├── PerspectiveAnalyzer (three-perspective analysis)
     └── CeremonyGate (relational accountability)
 ```
 
@@ -53,7 +53,7 @@ The engine provides:
 | `southNode` | Analysis — maps dependencies and computes execution order |
 | `westNode` | Validation — checks ceremony requirements and relational balance |
 | `northNode` | Action — builds the final action stack |
-| `PerspectiveAnalyzer` | Analyzes decomposition through Engineer/Ceremony/Story Engine universes |
+| `PerspectiveAnalyzer` | Reads the decomposition from the Engineer/Ceremony/Story Engine perspectives |
 | `CeremonyGate` | Evaluates proceed/caution/hold decisions based on balance and perspective |
 | `createDecompositionStateGraph` | Factory for LangGraph StateGraph integration |
 
@@ -89,7 +89,7 @@ Three lenses analyze the decomposition:
 - **Ceremony (Ava8)**: Relational coverage, ceremonial dimension, indigenous domain flags
 - **Story Engine (Miette)**: Narrative arc length, neglected perspectives, journey coherence
 
-Returns `ThreeUniversePerspective` with coherence score and synthesis recommendation.
+Returns `ThreePerspectiveInsights` with the lead perspective, coherence score and synthesis recommendation.
 
 ### CeremonyGate
 
@@ -119,5 +119,5 @@ The engine re-exports all core primitives from `ava-langchain-prompt-decompositi
 
 1. **DecompositionGraph**: End-to-end invoke produces complete state
 2. **Individual nodes**: Each directional node produces correct partial state
-3. **PerspectiveAnalyzer**: Three-universe analysis with keyword scoring
+3. **PerspectiveAnalyzer**: Three-perspective analysis with keyword scoring
 4. **CeremonyGate**: Gate decisions based on balance thresholds and flags

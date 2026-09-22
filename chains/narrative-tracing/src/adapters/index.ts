@@ -2,13 +2,15 @@
  * Narrative Tracing Adapters
  *
  * Adapters for integrating narrative-tracing with various systems:
- * - LangGraph Bridge: Three-universe processing to tracing
+ * - LangGraph Bridge: Three-perspective processing to tracing
  * - Miadi Integration: HTTP header-based correlation
  * - Storytelling Hooks: Beat lifecycle tracing
  */
 
 export {
   LangGraphBridge,
+  PerspectiveReadingLike,
+  ThreePerspectiveAnalysisLike,
   UniverseResult,
   ThreeUniverseAnalysisLike,
   AnalysisContext,

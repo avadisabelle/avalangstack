@@ -1,7 +1,7 @@
 {
   "name": "ava-langgraph-prompt-decomposition-engine",
   "version": "0.2.1",
-  "description": "Prompt Decomposition Engine for LangGraph.js - Graph-level orchestration of Four Directions analysis, three-universe perspective processing, and ceremony gating",
+  "description": "Prompt Decomposition Engine for LangGraph.js - Graph-level orchestration of Four Directions analysis, three-perspective processing, and ceremony gating",
   "type": "module",
   "engines": {
     "node": ">=18"
@@ -51,7 +51,7 @@
     "pde",
     "medicine-wheel",
     "four-directions",
-    "three-universe",
+    "three-perspective",
     "ceremony",
     "graph"
   ],

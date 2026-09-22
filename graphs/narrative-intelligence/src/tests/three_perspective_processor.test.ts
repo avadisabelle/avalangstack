@@ -1,13 +1,14 @@
 /**
- * Tests for three_universe_processor.ts
+ * Tests for three_perspective_processor.ts
  */
 
 import { describe, it, expect } from "vitest";
 import {
-  Universe,
+  PerspectiveType,
 } from "../schemas/unified_state_bridge.js";
 import {
   EventType,
+  ThreePerspectiveProcessor,
   ThreeUniverseProcessor,
   analyzeEngineerPerspective,
   analyzeCeremonyPerspective,
@@ -16,7 +17,7 @@ import {
   engineerIntentKeywords,
   ceremonyIntentKeywords,
   storyEngineIntentKeywords,
-} from "../graphs/three_universe_processor.js";
+} from "../graphs/three_perspective_processor.js";
 
 describe("EventType enum", () => {
   it("should have all event types", () => {
@@ -60,7 +61,7 @@ describe("analyzeEngineerPerspective", () => {
     const result = analyzeEngineerPerspective(state);
 
     expect(result.engineerPerspective).toBeDefined();
-    expect(result.engineerPerspective!.universe).toBe(Universe.ENGINEER);
+    expect(result.engineerPerspective!.perspectiveType).toBe(PerspectiveType.ENGINEER);
     expect(result.engineerPerspective!.intent).toBe("feature_implementation");
     expect(result.engineerPerspective!.confidence).toBeGreaterThan(0.5);
   });
@@ -113,7 +114,7 @@ describe("analyzeCeremonyPerspective", () => {
     const result = analyzeCeremonyPerspective(state);
 
     expect(result.ceremonyPerspective).toBeDefined();
-    expect(result.ceremonyPerspective!.universe).toBe(Universe.CEREMONY);
+    expect(result.ceremonyPerspective!.perspectiveType).toBe(PerspectiveType.CEREMONY);
     expect(result.ceremonyPerspective!.intent).toBe("co_creation");
     expect(result.ceremonyPerspective!.context.isCollaborative).toBe(true);
   });
@@ -151,7 +152,7 @@ describe("analyzeStoryEnginePerspective", () => {
     const result = analyzeStoryEnginePerspective(state);
 
     expect(result.storyEnginePerspective).toBeDefined();
-    expect(result.storyEnginePerspective!.universe).toBe(Universe.STORY_ENGINE);
+    expect(result.storyEnginePerspective!.perspectiveType).toBe(PerspectiveType.STORY_ENGINE);
     expect(result.storyEnginePerspective!.intent).toBe("inciting_incident");
     expect(result.storyEnginePerspective!.context.act).toBe(1);
   });
@@ -198,7 +199,7 @@ describe("synthesizePerspectives", () => {
     const result = synthesizePerspectives(state);
 
     expect(result.analysis).toBeDefined();
-    expect(result.leadUniverse).toBeDefined();
+    expect(result.leadPerspective).toBeDefined();
     expect(result.coherenceScore).toBeDefined();
     expect(result.coherenceScore).toBeGreaterThan(0);
     expect(result.coherenceScore).toBeLessThanOrEqual(1);
@@ -218,9 +219,9 @@ describe("synthesizePerspectives", () => {
   });
 });
 
-describe("ThreeUniverseProcessor", () => {
-  it("should process an event through all universes", () => {
-    const processor = new ThreeUniverseProcessor();
+describe("ThreePerspectiveProcessor", () => {
+  it("should read an event from all perspectives", () => {
+    const processor = new ThreePerspectiveProcessor();
 
     const analysis = processor.process(
       { content: "feat: implement new feature" },
@@ -231,7 +232,7 @@ describe("ThreeUniverseProcessor", () => {
     expect(analysis.engineer).toBeDefined();
     expect(analysis.ceremony).toBeDefined();
     expect(analysis.storyEngine).toBeDefined();
-    expect(analysis.leadUniverse).toBeDefined();
+    expect(analysis.leadPerspective).toBeDefined();
     expect(analysis.coherenceScore).toBeGreaterThan(0);
   });
 
@@ -241,7 +242,7 @@ describe("ThreeUniverseProcessor", () => {
       calls.push(args);
     };
 
-    const processor = new ThreeUniverseProcessor({ tracingCallback: callback });
+    const processor = new ThreePerspectiveProcessor({ tracingCallback: callback });
 
     processor.process({ content: "test" }, "test");
 
@@ -250,7 +251,7 @@ describe("ThreeUniverseProcessor", () => {
   });
 
   it("processWebhook should detect event type from payload", () => {
-    const processor = new ThreeUniverseProcessor();
+    const processor = new ThreePerspectiveProcessor();
 
     const analysis = processor.processWebhook({
       payload: {
@@ -267,7 +268,7 @@ describe("ThreeUniverseProcessor", () => {
   });
 
   it("createBeatFromAnalysis should create proper beat", () => {
-    const processor = new ThreeUniverseProcessor();
+    const processor = new ThreePerspectiveProcessor();
 
     const event = { content: "Complete the final feature" };
     const analysis = processor.process(event, "github.push");
@@ -277,19 +278,19 @@ describe("ThreeUniverseProcessor", () => {
     expect(beat.id).toContain("beat_");
     expect(beat.sequence).toBe(5);
     expect(beat.content).toBe("Complete the final feature");
-    expect(beat.universeAnalysis).toBe(analysis);
-    expect(beat.leadUniverse).toBe(analysis.leadUniverse);
+    expect(beat.perspectiveAnalysis).toBe(analysis);
+    expect(beat.leadPerspective).toBe(analysis.leadPerspective);
   });
 
-  it("should determine lead universe correctly", () => {
-    const processor = new ThreeUniverseProcessor();
+  it("should determine lead perspective correctly", () => {
+    const processor = new ThreePerspectiveProcessor();
 
     // Security issue should lead to ENGINEER
     const securityAnalysis = processor.process(
       { content: "security: fix vulnerability" },
       "github.push"
     );
-    expect(securityAnalysis.leadUniverse).toBe(Universe.ENGINEER);
+    expect(securityAnalysis.leadPerspective).toBe(PerspectiveType.ENGINEER);
 
     // Collaborative work should lead to CEREMONY
     const collaborativeAnalysis = processor.process(
@@ -304,6 +305,28 @@ describe("ThreeUniverseProcessor", () => {
       },
       "github.push"
     );
-    expect(collaborativeAnalysis.leadUniverse).toBe(Universe.CEREMONY);
+    expect(collaborativeAnalysis.leadPerspective).toBe(PerspectiveType.CEREMONY);
+  });
+});
+
+describe("Deprecated processor alias", () => {
+  it("ThreeUniverseProcessor still constructs the perspective processor", () => {
+    const processor = new ThreeUniverseProcessor();
+    expect(processor).toBeInstanceOf(ThreePerspectiveProcessor);
+    const analysis = processor.process({ content: "security: fix vulnerability" }, "github.push");
+    expect(analysis.leadPerspective).toBe(PerspectiveType.ENGINEER);
+  });
+
+  it("sends perspectiveType, not a bare universe key, to tracing callbacks", () => {
+    const calls: unknown[][] = [];
+    const processor = new ThreePerspectiveProcessor({
+      tracingCallback: (...args: unknown[]) => {
+        calls.push(args);
+      },
+    });
+    processor.process({ content: "test" }, "test");
+    const engineerRecord = calls[0][2] as Record<string, unknown>;
+    expect(engineerRecord.perspectiveType).toBe(PerspectiveType.ENGINEER);
+    expect("universe" in engineerRecord).toBe(false);
   });
 });

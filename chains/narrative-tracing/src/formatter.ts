@@ -11,6 +11,9 @@ import {
   NarrativeMetrics,
   NarrativeSpan,
   createNarrativeMetrics,
+  getCrossPerspectiveCoherence,
+  getSpanLeadPerspective,
+  isThreePerspectiveAnalysisEvent,
 } from "./event_types.js";
 import { CompletedTrace } from "./orchestrator.js";
 
@@ -174,9 +177,8 @@ export class NarrativeTraceFormatter {
           .pop()
           ?.replace(/_/g, " ")
           .replace(/\b\w/g, (l) => l.toUpperCase());
-        const context = span.leadUniverse
-          ? ` (lead: ${span.leadUniverse})`
-          : "";
+        const leadPerspective = getSpanLeadPerspective(span);
+        const context = leadPerspective ? ` (lead: ${leadPerspective})` : "";
         lines.push(`├─ ${glyph} ${eventName}${context}`);
       }
     }
@@ -243,8 +245,9 @@ export class NarrativeTraceFormatter {
       if (span.emotionalTone) {
         lines.push(`          │   emotion: ${span.emotionalTone}`);
       }
-      if (span.leadUniverse) {
-        lines.push(`          │   universe: ${span.leadUniverse}`);
+      const leadPerspective = getSpanLeadPerspective(span);
+      if (leadPerspective) {
+        lines.push(`          │   perspective: ${leadPerspective}`);
       }
     }
 
@@ -317,9 +320,9 @@ export class NarrativeTraceFormatter {
         `| Theme Clarity | ${trace.metrics.themeClarity.toFixed(2)} |`
       );
       lines.push(
-        `| Cross-Universe Coherence | ${trace.metrics.crossUniverseCoherence.toFixed(
-          2
-        )} |`
+        `| Cross-Perspective Coherence | ${getCrossPerspectiveCoherence(
+          trace.metrics
+        ).toFixed(2)} |`
       );
       lines.push(
         `| Overall Quality | ${this.calculateOverallQuality(
@@ -345,8 +348,9 @@ export class NarrativeTraceFormatter {
       if (span.characterIds.length > 0) {
         lines.push(`- **Characters**: ${span.characterIds.join(", ")}`);
       }
-      if (span.leadUniverse) {
-        lines.push(`- **Lead Universe**: ${span.leadUniverse}`);
+      const leadPerspective = getSpanLeadPerspective(span);
+      if (leadPerspective) {
+        lines.push(`- **Lead Perspective**: ${leadPerspective}`);
       }
       lines.push("");
     }
@@ -409,16 +413,17 @@ export class NarrativeTraceFormatter {
       (s) => s.eventType === NarrativeEventType.ROUTING_DECISION
     ).length;
 
-    // Calculate average coherence from three-universe analyses
-    const universeSpans = trace.spans.filter(
-      (s) => s.eventType === NarrativeEventType.THREE_UNIVERSE_ANALYSIS
+    // Calculate average coherence from three-perspective analyses
+    // (current and legacy event-type values)
+    const perspectiveSpans = trace.spans.filter((s) =>
+      isThreePerspectiveAnalysisEvent(s.eventType)
     );
-    if (universeSpans.length > 0) {
-      const coherences = universeSpans
+    if (perspectiveSpans.length > 0) {
+      const coherences = perspectiveSpans
         .filter((s) => s.outputData)
         .map((s) => (s.outputData as any)?.coherence_score ?? 0.5);
       if (coherences.length > 0) {
-        metrics.crossUniverseCoherence =
+        metrics.crossPerspectiveCoherence =
           coherences.reduce((a, b) => a + b, 0) / coherences.length;
       }
     }
@@ -508,10 +513,10 @@ export class NarrativeTraceFormatter {
       );
     }
 
-    // Cross-universe coherence suggestions
-    if (metrics.crossUniverseCoherence < 0.5) {
+    // Cross-perspective coherence suggestions
+    if (getCrossPerspectiveCoherence(metrics) < 0.5) {
       suggestions.push(
-        "🌌 Three-universe alignment is low. Review if Engineer, Ceremony, " +
+        "🌌 Three-perspective alignment is low. Review if Engineer, Ceremony, " +
           "and Story Engine perspectives are all represented."
       );
     }
@@ -564,7 +569,7 @@ export class NarrativeTraceFormatter {
       coherence: 0.25,
       emotionalArc: 0.2,
       themeClarity: 0.15,
-      crossUniverse: 0.2,
+      crossPerspective: 0.2,
       characterArc: 0.2,
     };
 
@@ -578,7 +583,7 @@ export class NarrativeTraceFormatter {
       metrics.coherenceScore * weights.coherence +
       metrics.emotionalArcStrength * weights.emotionalArc +
       metrics.themeClarity * weights.themeClarity +
-      metrics.crossUniverseCoherence * weights.crossUniverse +
+      getCrossPerspectiveCoherence(metrics) * weights.crossPerspective +
       avgCharacterArc * weights.characterArc
     );
   }

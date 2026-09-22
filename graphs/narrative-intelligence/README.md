@@ -6,7 +6,7 @@ Narrative Intelligence Toolkit for JavaScript/TypeScript - a complete port of th
 
 This package provides the core narrative intelligence components for the LangGraph ecosystem:
 
-- **Three-Universe Processing** - Analyze events through Engineer (Mia), Ceremony (Ava8), and Story Engine (Miette) perspectives
+- **Three-Perspective Processing** - Read each event from the Engineer (Mia), Ceremony (Ava8), and Story Engine (Miette) perspectives
 - **Narrative Coherence Analysis** - Score narrative quality across 5 dimensions with actionable gap identification
 - **Story Beat Classification** - Emotional tone detection using rule-based and LLM classification
 - **State Management** - Redis-backed persistence for cross-system state sharing
@@ -31,14 +31,16 @@ npm install ioredis
 
 ## Quick Start
 
-### Three-Universe Processing
+<a id="three-universe-processing"></a>
 
-Process any event through three interpretive lenses:
+### Three-Perspective Processing
+
+Read any event from three perspectives:
 
 ```typescript
-import { ThreeUniverseProcessor } from "ava-langgraph-narrative-intelligence";
+import { ThreePerspectiveProcessor } from "ava-langgraph-narrative-intelligence";
 
-const processor = new ThreeUniverseProcessor();
+const processor = new ThreePerspectiveProcessor();
 
 // Process a GitHub event
 const analysis = processor.process(
@@ -46,10 +48,10 @@ const analysis = processor.process(
   "github.push"
 );
 
-console.log(`Lead universe: ${analysis.leadUniverse}`); // "ceremony" (collaborative work)
+console.log(`Lead perspective: ${analysis.leadPerspective}`); // "ceremony" (collaborative work)
 console.log(`Coherence: ${analysis.coherenceScore}`); // 0.75
 
-// Access individual perspectives
+// Access each perspective's reading
 console.log(analysis.engineer.intent); // "feature_implementation"
 console.log(analysis.ceremony.intent); // "co_creation"
 console.log(analysis.storyEngine.intent); // "rising_action"
@@ -129,7 +131,7 @@ addBeat(state, beat);
 
 console.log(`Act: ${state.position.act}`);
 console.log(`Beat count: ${state.position.beatCount}`);
-console.log(`Lead universe: ${state.position.leadUniverse}`);
+console.log(`Lead perspective: ${state.position.leadPerspective}`);
 ```
 
 ### Redis Persistence
@@ -157,11 +159,13 @@ await manager.cacheEventAnalysis("event_123", analysis);
 await manager.disconnect();
 ```
 
-## The Three Universes
+<a id="the-three-universes"></a>
 
-The three-universe model from `multiverse_3act`:
+## The Three Perspectives
 
-| Universe | Character | Focus | Keywords |
+The three perspectives from `multiverse_3act`. Each one is a reading of the same event, and the stored values are `engineer`, `ceremony` and `story_engine`:
+
+| Perspective | Character | Focus | Keywords |
 |----------|-----------|-------|----------|
 | **ENGINEER** | Mia (The Builder) | Technical precision | feat:, fix:, refactor |
 | **CEREMONY** | Ava8 (The Keeper) | Relational protocols | together, thanks, collaborate |
@@ -203,12 +207,12 @@ Connect to the `@langchain/langchain-narrative-tracing` package:
 
 ```typescript
 import { LangGraphBridge } from "@langchain/langchain-narrative-tracing";
-import { ThreeUniverseProcessor } from "ava-langgraph-narrative-intelligence";
+import { ThreePerspectiveProcessor } from "ava-langgraph-narrative-intelligence";
 
 const bridge = new LangGraphBridge(handler);
 
-const processor = new ThreeUniverseProcessor({
-  tracingCallback: bridge.createThreeUniverseCallback(),
+const processor = new ThreePerspectiveProcessor({
+  tracingCallback: bridge.createThreePerspectiveCallback(),
 });
 
 // All analyses now get traced to Langfuse
@@ -223,7 +227,7 @@ const analysis = processor.process(event, "github.push");
 // Main exports
 export {
   // Processing
-  ThreeUniverseProcessor,
+  ThreePerspectiveProcessor,
   NarrativeCoherenceEngine,
   EmotionalBeatClassifierNode,
   
@@ -232,7 +236,9 @@ export {
   createUnifiedNarrativeState,
   
   // Types
-  Universe,
+  PerspectiveType,
+  PerspectiveReading,
+  ThreePerspectiveAnalysis,
   NarrativeFunction,
   NarrativePhase,
   GapType,
@@ -251,6 +257,10 @@ import * as nodes from "ava-langgraph-narrative-intelligence/nodes";
 import * as integrations from "ava-langgraph-narrative-intelligence/integrations";
 ```
 
+### Earlier names
+
+Earlier releases called the three readings "universes". Those names still work as deprecated aliases: `Universe` (now `PerspectiveType`), `UniversePerspective` (`PerspectiveReading`), `ThreeUniverseAnalysis` (`ThreePerspectiveAnalysis`), `ThreeUniverseState` (`ThreePerspectiveState`), `ThreeUniverseProcessor` (`ThreePerspectiveProcessor`) and their `create*` functions. Records now carry `perspectiveType`, `leadPerspective` and `perspectiveAnalysis`. The Redis readers and `deserializeState` also accept records stored with the old `universe`, `leadUniverse` and `universeAnalysis` keys, and map `engineer-world`, `ceremony-world` and `story-engine-world` to the bare values.
+
 ## Python Parity
 
 This package is a complete TypeScript port of the Python `narrative-intelligence` package, maintaining full feature parity:
@@ -259,7 +269,7 @@ This package is a complete TypeScript port of the Python `narrative-intelligence
 |---------------|-------------------|
 | `narrative_intelligence/schemas/unified_state_bridge.py` | `schemas/unified_state_bridge.ts` |
 | `narrative_intelligence/schemas/ncp.py` | `schemas/ncp.ts` |
-| `narrative_intelligence/graphs/three_universe_processor.py` | `graphs/three_universe_processor.ts` |
+| `narrative_intelligence/graphs/three_universe_processor.py` | `graphs/three_perspective_processor.ts` |
 | `narrative_intelligence/graphs/coherence_engine.py` | `graphs/coherence_engine.ts` |
 | `narrative_intelligence/nodes/emotional_classifier.py` | `nodes/emotional_classifier.ts` |
 | `narrative_intelligence/integrations/redis_state.py` | `integrations/redis_state.ts` |

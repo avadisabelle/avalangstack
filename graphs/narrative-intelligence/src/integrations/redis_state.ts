@@ -13,12 +13,15 @@
 import {
   UnifiedNarrativeState,
   StoryBeat,
-  ThreeUniverseAnalysis,
+  ThreePerspectiveAnalysis,
   RoutingDecision,
   RedisKeys,
   createUnifiedNarrativeState,
   serializeState,
   deserializeState,
+  normalizeStoryBeat,
+  normalizeThreePerspectiveAnalysis,
+  normalizeRoutingDecision,
   addBeat,
   addRoutingDecision,
   startNewEpisode,
@@ -98,7 +101,7 @@ export interface HealthCheckResult {
  * Responsibilities:
  * - Store and retrieve UnifiedNarrativeState
  * - Manage story beat persistence
- * - Cache three-universe analysis results
+ * - Cache three-perspective analysis results
  * - Track routing decision history
  * - Enable cross-system state sharing
  *
@@ -338,7 +341,8 @@ export class NarrativeRedisManager {
 
     if (data) {
       try {
-        return JSON.parse(data) as StoryBeat;
+        // Accepts beats stored before the perspective rename.
+        return normalizeStoryBeat(JSON.parse(data));
       } catch (e) {
         console.error(`Failed to deserialize beat ${beatId}:`, e);
         return null;
@@ -376,11 +380,11 @@ export class NarrativeRedisManager {
   // =========================================================================
 
   /**
-   * Cache three-universe analysis for a webhook event.
+   * Cache three-perspective analysis for a webhook event.
    */
   async cacheEventAnalysis(
     eventId: string,
-    analysis: ThreeUniverseAnalysis
+    analysis: ThreePerspectiveAnalysis
   ): Promise<boolean> {
     if (!this.redis) return false;
 
@@ -400,7 +404,7 @@ export class NarrativeRedisManager {
    */
   async getCachedAnalysis(
     eventId: string
-  ): Promise<ThreeUniverseAnalysis | null> {
+  ): Promise<ThreePerspectiveAnalysis | null> {
     if (!this.redis) return null;
 
     const key = RedisKeys.eventAnalysis(eventId);
@@ -408,7 +412,8 @@ export class NarrativeRedisManager {
 
     if (data) {
       try {
-        return JSON.parse(data) as ThreeUniverseAnalysis;
+        // Accepts analyses stored before the perspective rename.
+        return normalizeThreePerspectiveAnalysis(JSON.parse(data));
       } catch (e) {
         console.error(`Failed to deserialize analysis for ${eventId}:`, e);
         return null;
@@ -466,7 +471,9 @@ export class NarrativeRedisManager {
     const decisions: RoutingDecision[] = [];
     for (const data of dataList) {
       try {
-        decisions.push(JSON.parse(data) as RoutingDecision);
+        // Routing history has no TTL: accept decisions stored before the
+        // perspective rename.
+        decisions.push(normalizeRoutingDecision(JSON.parse(data)));
       } catch (e) {
         console.warn("Failed to deserialize routing decision:", e);
       }

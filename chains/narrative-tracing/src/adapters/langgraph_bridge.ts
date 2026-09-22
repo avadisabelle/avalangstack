@@ -1,16 +1,18 @@
 /**
  * LangGraph Bridge Adapter
  *
- * Wires the LangGraph ThreeUniverseProcessor to narrative-tracing,
- * so every three-universe analysis automatically logs to Langfuse.
+ * Wires the LangGraph ThreePerspectiveProcessor to narrative-tracing,
+ * so every three-perspective analysis automatically logs to Langfuse.
  */
 
 import { NarrativeTracingHandler } from "../handler.js";
+import { normalizePerspectiveValue } from "../event_types.js";
 
 /**
- * Simplified result from a single universe analysis
+ * Simplified reading from a single perspective (the structural form of
+ * narrative-intelligence's `PerspectiveReading`)
  */
-export interface UniverseResult {
+export interface PerspectiveReadingLike {
   intent: string;
   confidence: number;
   suggestedFlows: string[];
@@ -18,14 +20,38 @@ export interface UniverseResult {
 }
 
 /**
- * Protocol matching LangGraph's ThreeUniverseAnalysis
+ * @deprecated use PerspectiveReadingLike
  */
-export interface ThreeUniverseAnalysisLike {
+export type UniverseResult = PerspectiveReadingLike;
+
+/**
+ * Protocol matching LangGraph's ThreePerspectiveAnalysis. Accepts the lead as
+ * `leadPerspective` or, from analyses made before the perspective rename,
+ * as `leadUniverse`.
+ */
+export interface ThreePerspectiveAnalysisLike {
   engineer: { intent: string; confidence: number };
   ceremony: { intent: string; confidence: number };
   storyEngine: { intent: string; confidence: number };
-  leadUniverse: string | { value: string };
+  leadPerspective?: string | { value: string };
+  /** @deprecated use leadPerspective */
+  leadUniverse?: string | { value: string };
   coherenceScore: number;
+}
+
+/**
+ * @deprecated use ThreePerspectiveAnalysisLike
+ */
+export type ThreeUniverseAnalysisLike = ThreePerspectiveAnalysisLike;
+
+/**
+ * Lead perspective of an analysis as a bare string. Accepts `leadPerspective`
+ * or the legacy `leadUniverse`, as a string or an enum-like `{ value }`.
+ */
+function leadOf(analysis: ThreePerspectiveAnalysisLike): string | undefined {
+  const lead = analysis.leadPerspective ?? analysis.leadUniverse;
+  const value = typeof lead === "object" && lead !== null ? lead.value : lead;
+  return normalizePerspectiveValue(value);
 }
 
 /**
@@ -37,7 +63,7 @@ export interface AnalysisContext {
   engineerResult?: Record<string, unknown>;
   ceremonyResult?: Record<string, unknown>;
   storyEngineResult?: Record<string, unknown>;
-  leadUniverse: string;
+  leadPerspective: string;
   coherenceScore: number;
   parentSpanId?: string;
 }
@@ -46,10 +72,10 @@ export interface LangGraphBridgeOptions {
   autoFlush?: boolean;
 }
 
-const VALID_UNIVERSES = new Set(["engineer", "ceremony", "story_engine"]);
+const VALID_PERSPECTIVES = new Set(["engineer", "ceremony", "story_engine"]);
 
 /**
- * Wire LangGraph three-universe processing to narrative tracing.
+ * Wire LangGraph three-perspective processing to narrative tracing.
  *
  * @example
  * ```typescript
@@ -57,16 +83,16 @@ const VALID_UNIVERSES = new Set(["engineer", "ceremony", "story_engine"]);
  * const bridge = new LangGraphBridge(handler);
  *
  * // Get callback for manual injection
- * const callback = bridge.createThreeUniverseCallback();
+ * const callback = bridge.createThreePerspectiveCallback();
  *
  * // After processing an event
  * callback({
  *   eventId: 'evt_123',
- *   eventContent: 'feat: add three-universe processing',
+ *   eventContent: 'feat: add three-perspective processing',
  *   engineerResult: { intent: 'feature_implementation', confidence: 0.8 },
  *   ceremonyResult: { intent: 'co_creation', confidence: 0.7 },
  *   storyEngineResult: { intent: 'rising_action', confidence: 0.85 },
- *   leadUniverse: 'story_engine',
+ *   leadPerspective: 'story_engine',
  *   coherenceScore: 0.82
  * });
  * ```
@@ -89,22 +115,27 @@ export class LangGraphBridge {
   // ===========================================================================
 
   /**
-   * Create callback function for logging three-universe analysis
+   * Create callback function for logging three-perspective analysis
    */
-  createThreeUniverseCallback(parentSpanId?: string): (params: {
+  createThreePerspectiveCallback(parentSpanId?: string): (params: {
     eventId: string;
     eventContent: string;
     engineerResult: Record<string, unknown>;
     ceremonyResult: Record<string, unknown>;
     storyEngineResult: Record<string, unknown>;
-    leadUniverse: string;
+    leadPerspective?: string;
+    /** @deprecated use leadPerspective */
+    leadUniverse?: string;
     coherenceScore: number;
   }) => string {
     return (params) => {
       this.validateCoherenceScore(params.coherenceScore);
-      this.validateLeadUniverse(params.leadUniverse);
+      const leadPerspective = normalizePerspectiveValue(
+        params.leadPerspective ?? params.leadUniverse
+      );
+      this.validateLeadPerspective(leadPerspective);
 
-      const spanId = this.handler.logThreeUniverseAnalysis({
+      const spanId = this.handler.logThreePerspectiveAnalysis({
         eventId: params.eventId,
         engineerIntent: (params.engineerResult.intent as string) || "unknown",
         engineerConfidence:
@@ -116,7 +147,7 @@ export class LangGraphBridge {
           (params.storyEngineResult.intent as string) || "unknown",
         storyEngineConfidence:
           (params.storyEngineResult.confidence as number) || 0.0,
-        leadUniverse: params.leadUniverse,
+        leadPerspective,
         coherenceScore: params.coherenceScore,
         parentSpanId,
       });
@@ -131,28 +162,31 @@ export class LangGraphBridge {
     };
   }
 
+  /**
+   * @deprecated use createThreePerspectiveCallback
+   */
+  createThreeUniverseCallback(
+    parentSpanId?: string
+  ): ReturnType<LangGraphBridge["createThreePerspectiveCallback"]> {
+    return this.createThreePerspectiveCallback(parentSpanId);
+  }
+
   // ===========================================================================
   // ANALYSIS OBJECT APPROACH
   // ===========================================================================
 
   /**
-   * Log a ThreeUniverseAnalysis object directly
+   * Log a ThreePerspectiveAnalysis object directly
    */
   logAnalysis(
     eventId: string,
-    analysis: ThreeUniverseAnalysisLike,
+    analysis: ThreePerspectiveAnalysisLike,
     options: {
       eventContent?: string;
       parentSpanId?: string;
     } = {}
   ): string {
-    // Extract lead universe value (handle enum or string)
-    let leadValue =
-      typeof analysis.leadUniverse === "object"
-        ? analysis.leadUniverse.value
-        : analysis.leadUniverse;
-
-    return this.handler.logThreeUniverseAnalysis({
+    return this.handler.logThreePerspectiveAnalysis({
       eventId,
       engineerIntent: analysis.engineer.intent,
       engineerConfidence: analysis.engineer.confidence,
@@ -160,7 +194,7 @@ export class LangGraphBridge {
       ceremonyConfidence: analysis.ceremony.confidence,
       storyEngineIntent: analysis.storyEngine.intent,
       storyEngineConfidence: analysis.storyEngine.confidence,
-      leadUniverse: leadValue,
+      leadPerspective: leadOf(analysis),
       coherenceScore: analysis.coherenceScore,
       parentSpanId: options.parentSpanId,
     });
@@ -171,9 +205,9 @@ export class LangGraphBridge {
   // ===========================================================================
 
   /**
-   * Wrap a function that takes an event and returns a ThreeUniverseAnalysis
+   * Wrap a function that takes an event and returns a ThreePerspectiveAnalysis
    */
-  traceProcessor<T extends ThreeUniverseAnalysisLike>(
+  traceProcessor<T extends ThreePerspectiveAnalysisLike>(
     fn: (event: Record<string, unknown>) => T | Promise<T>,
     eventIdExtractor?: (event: Record<string, unknown>) => string
   ): (event: Record<string, unknown>) => Promise<T> {
@@ -186,7 +220,7 @@ export class LangGraphBridge {
 
       if (
         result &&
-        "leadUniverse" in result &&
+        ("leadPerspective" in result || "leadUniverse" in result) &&
         "coherenceScore" in result
       ) {
         this.logAnalysis(eventId, result, {
@@ -203,7 +237,7 @@ export class LangGraphBridge {
   // ===========================================================================
 
   /**
-   * Log creation of a story beat from three-universe analysis
+   * Log creation of a story beat from three-perspective analysis
    */
   logBeatCreation(
     beatId: string,
@@ -211,18 +245,14 @@ export class LangGraphBridge {
     sequence: number,
     narrativeFunction: string,
     options: {
-      analysis?: ThreeUniverseAnalysisLike;
+      analysis?: ThreePerspectiveAnalysisLike;
       emotionalTone?: string;
       parentSpanId?: string;
     } = {}
   ): string {
-    let source = "three_universe_processor";
+    let source = "three_perspective_processor";
     if (options.analysis) {
-      const lead =
-        typeof options.analysis.leadUniverse === "object"
-          ? options.analysis.leadUniverse.value
-          : options.analysis.leadUniverse;
-      source = `${lead}_led`;
+      source = `${leadOf(options.analysis)}_led`;
     }
 
     return this.handler.logBeatCreation(beatId, content, sequence, narrativeFunction, {
@@ -244,10 +274,12 @@ export class LangGraphBridge {
     }
   }
 
-  private validateLeadUniverse(universe: string): void {
-    if (!VALID_UNIVERSES.has(universe)) {
+  private validateLeadPerspective(perspective: string | undefined): void {
+    if (perspective === undefined || !VALID_PERSPECTIVES.has(perspective)) {
+      // The message keeps its pre-rename wording until the remove release,
+      // because callers may match on it.
       throw new Error(
-        `lead_universe must be one of ${[...VALID_UNIVERSES].join(", ")}, got '${universe}'`
+        `lead_universe must be one of ${[...VALID_PERSPECTIVES].join(", ")}, got '${perspective}'`
       );
     }
   }

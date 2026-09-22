@@ -18,7 +18,7 @@ import {
   createStoryBeat,
   createCharacterState,
   createThematicThread,
-  Universe,
+  PerspectiveType,
 } from "../schemas/unified_state_bridge.js";
 
 describe("Enums", () => {
@@ -116,10 +116,10 @@ describe("NarrativeCoherenceEngine", () => {
 
   const createTestCharacters = () => {
     return [
-      createCharacterState("char_1", "Hero", "protagonist", Universe.STORY_ENGINE, {
+      createCharacterState("char_1", "Hero", "protagonist", PerspectiveType.STORY_ENGINE, {
         arcPosition: 0.5,
       }),
-      createCharacterState("char_2", "Mentor", "guide", Universe.CEREMONY, {
+      createCharacterState("char_2", "Mentor", "guide", PerspectiveType.CEREMONY, {
         arcPosition: 0.3,
       }),
     ];
@@ -203,7 +203,7 @@ describe("NarrativeCoherenceEngine", () => {
     }
 
     const characters = [
-      createCharacterState("hero", "Hero", "protagonist", Universe.STORY_ENGINE),
+      createCharacterState("hero", "Hero", "protagonist", PerspectiveType.STORY_ENGINE),
     ];
 
     const result = engine.analyze(beats, characters);

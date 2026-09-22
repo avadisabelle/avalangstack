@@ -5,7 +5,7 @@ A Langfuse-based tracing integration for the Narrative Intelligence Stack.
 ## Overview
 
 This package provides narrative-aware observability across:
-- LangGraph (three-universe processing)
+- LangGraph (three-perspective processing)
 - Flowise (agent coordination)
 - Langflow (routing)
 - Storytelling system (beat generation)
@@ -44,8 +44,8 @@ handler.logBeatCreation(
   { emotionalTone: 'intrigue' }
 );
 
-// Log three-universe analysis
-handler.logThreeUniverseAnalysis({
+// Log three-perspective analysis
+handler.logThreePerspectiveAnalysis({
   eventId: 'evt_123',
   engineerIntent: 'feature_implementation',
   engineerConfidence: 0.8,
@@ -53,7 +53,7 @@ handler.logThreeUniverseAnalysis({
   ceremonyConfidence: 0.7,
   storyEngineIntent: 'rising_action',
   storyEngineConfidence: 0.85,
-  leadUniverse: 'story_engine',
+  leadPerspective: 'story_engine',
   coherenceScore: 0.82,
 });
 
@@ -129,7 +129,7 @@ const suggestions = formatter.generateImprovementSuggestions(metrics);
 
 ### LangGraph Bridge
 
-Wire ThreeUniverseProcessor to narrative tracing.
+Wire ThreePerspectiveProcessor to narrative tracing.
 
 ```typescript
 import { LangGraphBridge } from '@langchain/narrative-tracing/adapters';
@@ -137,13 +137,13 @@ import { LangGraphBridge } from '@langchain/narrative-tracing/adapters';
 const bridge = new LangGraphBridge(handler);
 
 // Create callback for manual use
-const callback = bridge.createThreeUniverseCallback();
+const callback = bridge.createThreePerspectiveCallback();
 callback({
   eventId: 'evt_123',
   engineerResult: { intent: 'feature_request', confidence: 0.8 },
   ceremonyResult: { intent: 'co_creation', confidence: 0.7 },
   storyEngineResult: { intent: 'rising_action', confidence: 0.85 },
-  leadUniverse: 'story_engine',
+  leadPerspective: 'story_engine',
   coherenceScore: 0.82,
 });
 
@@ -215,7 +215,7 @@ The package defines semantic event types for narrative operations:
 
 - **Beat Events**: `BEAT_CREATED`, `BEAT_ANALYZED`, `BEAT_ENRICHED`
 - **Story Events**: `STORY_GENERATION_START`, `STORY_GENERATION_END`, `STORY_QUALITY_METRICS`
-- **Three-Universe Events**: `THREE_UNIVERSE_ANALYSIS`, `UNIVERSE_PERSPECTIVE_SHIFT`
+- **Three-Perspective Events**: `THREE_PERSPECTIVE_ANALYSIS`, `PERSPECTIVE_SHIFT`
 - **Character Events**: `CHARACTER_ARC_UPDATED`, `CHARACTER_RELATIONSHIP_CHANGED`
 - **Theme Events**: `THEME_INTRODUCED`, `THEME_REINFORCED`, `THEME_RESOLVED`
 - **Routing Events**: `ROUTING_DECISION`, `FLOW_EXECUTED`
@@ -223,6 +223,8 @@ The package defines semantic event types for narrative operations:
 - **Checkpoint Events**: `NARRATIVE_CHECKPOINT`, `EPISODE_BOUNDARY`
 
 Each event type has an associated emoji glyph for human-readable display.
+
+Earlier releases called the three readings "universes". `logThreeUniverseAnalysis`, `createThreeUniverseCallback`, `ThreeUniverseAnalysisLike`, `UniverseResult` and the `leadUniverse` option remain as deprecated aliases. Spans are now written with `lead_perspective` and the `narrative.three_perspective.analysis` event type, and metrics with `crossPerspectiveCoherence`. The formatter and episode bundler also read spans and metrics recorded with `leadUniverse`, `narrative.three_universe.analysis` and `crossUniverseCoherence`, which keep their `THREE_UNIVERSE_ANALYSIS` and `UNIVERSE_PERSPECTIVE_SHIFT` enum members.
 
 ## Environment Variables
 

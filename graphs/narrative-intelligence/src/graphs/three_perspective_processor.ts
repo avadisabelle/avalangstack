@@ -1,25 +1,25 @@
 /**
- * Three-Universe Processor
+ * Three-Perspective Processor
  *
- * Processes events through all three universe lenses:
- * - Engineer World (Mia) - Technical precision
- * - Ceremony World (Ava8) - Relational protocols
- * - Story Engine World (Miette) - Narrative patterns
+ * Reads each event from three perspectives:
+ * - Engineer perspective (Mia) - Technical precision
+ * - Ceremony perspective (Ava8) - Relational protocols
+ * - Story Engine perspective (Miette) - Narrative patterns
  *
- * This produces a ThreeUniverseAnalysis with:
- * - Individual perspectives from each universe
- * - Lead universe determination
+ * This produces a ThreePerspectiveAnalysis with:
+ * - One reading per perspective
+ * - Lead perspective determination
  * - Coherence score
  */
 
 import {
-  Universe,
-  UniversePerspective,
-  ThreeUniverseAnalysis,
+  PerspectiveType,
+  PerspectiveReading,
+  ThreePerspectiveAnalysis,
   NarrativeFunction,
   StoryBeat,
-  createUniversePerspective,
-  createThreeUniverseAnalysis,
+  createPerspectiveReading,
+  createThreePerspectiveAnalysis,
   createStoryBeat,
   getNarrativeFunctionFromString,
 } from "../schemas/unified_state_bridge.js";
@@ -39,7 +39,7 @@ export enum EventType {
 }
 
 /**
- * An event ready for three-universe processing.
+ * An event ready for three-perspective processing.
  */
 export interface ProcessedEvent {
   eventId: string;
@@ -51,21 +51,21 @@ export interface ProcessedEvent {
 }
 
 /**
- * State for the three-universe processor.
+ * State for the three-perspective processor.
  */
-export interface ThreeUniverseState {
+export interface ThreePerspectiveState {
   // Input
   event: Record<string, unknown>;
   eventType: string;
 
   // Processing state
-  engineerPerspective?: UniversePerspective;
-  ceremonyPerspective?: UniversePerspective;
-  storyEnginePerspective?: UniversePerspective;
+  engineerPerspective?: PerspectiveReading;
+  ceremonyPerspective?: PerspectiveReading;
+  storyEnginePerspective?: PerspectiveReading;
 
   // Output
-  analysis?: ThreeUniverseAnalysis;
-  leadUniverse?: Universe;
+  analysis?: ThreePerspectiveAnalysis;
+  leadPerspective?: PerspectiveType;
   coherenceScore?: number;
 
   // Error handling
@@ -73,7 +73,12 @@ export interface ThreeUniverseState {
 }
 
 /**
- * Protocol for callbacks that receive three-universe analysis results.
+ * @deprecated use ThreePerspectiveState
+ */
+export type ThreeUniverseState = ThreePerspectiveState;
+
+/**
+ * Protocol for callbacks that receive three-perspective analysis results.
  */
 export type AnalysisCallback = (
   eventId: string,
@@ -81,27 +86,28 @@ export type AnalysisCallback = (
   engineerResult: Record<string, unknown>,
   ceremonyResult: Record<string, unknown>,
   storyEngineResult: Record<string, unknown>,
-  leadUniverse: string,
+  leadPerspective: string,
   coherenceScore: number
 ) => void;
 
 /**
- * A map of intent name -> the terms that signal it. Every universe's lexicon
+ * A map of intent name -> the terms that signal it. Every perspective's lexicon
  * uses this shape, and every consumer can pass their own domain vocabulary in
  * rather than forking the classifier.
  */
 export type IntentKeywordMap = Record<string, string[]>;
 
 /**
- * Confidence assigned when a universe finds NO supporting evidence. Kept equal
- * across all three universes so an empty-evidence event does not silently tilt
- * to whichever universe happened to have the highest fallback — the historical
- * cause of plain engineering text landing in ceremony.
+ * Confidence assigned when a perspective finds NO supporting evidence. Kept
+ * equal across all three perspectives so an empty-evidence event does not
+ * silently tilt to whichever perspective happened to have the highest
+ * fallback — the historical cause of plain engineering text landing in
+ * ceremony.
  */
 export const NO_EVIDENCE_CONFIDENCE = 0.4;
 
 /**
- * Default minimum confidence margin between the winning universe and the
+ * Default minimum confidence margin between the winning perspective and the
  * runner-up. Below this the lead is reported as `ambiguous` instead of asserted.
  */
 export const DEFAULT_MIN_CONFIDENCE_MARGIN = 0.15;
@@ -132,7 +138,7 @@ function scoreIntents(
 }
 
 // =============================================================================
-// Engineer World (Mia) - The Builder
+// Engineer perspective (Mia) - The Builder
 // =============================================================================
 
 /**
@@ -181,7 +187,7 @@ export function engineerIntentKeywords(): Record<string, string[]> {
 }
 
 /**
- * Mia's perspective: The Builder (Engineer-world)
+ * Mia's perspective: The Builder (Engineer perspective)
  *
  * Focuses on:
  * - What was built/changed
@@ -190,9 +196,9 @@ export function engineerIntentKeywords(): Record<string, string[]> {
  * - Flow routing for technical actions
  */
 export function analyzeEngineerPerspective(
-  state: ThreeUniverseState,
+  state: ThreePerspectiveState,
   keywords: IntentKeywordMap = engineerIntentKeywords()
-): ThreeUniverseState {
+): ThreePerspectiveState {
   const event = state.event;
   const eventType = state.eventType;
 
@@ -267,8 +273,8 @@ export function analyzeEngineerPerspective(
     estimatedComplexity: estimateComplexity(content, event),
   };
 
-  const perspective = createUniversePerspective(
-    Universe.ENGINEER,
+  const perspective = createPerspectiveReading(
+    PerspectiveType.ENGINEER,
     intent,
     confidence,
     { suggestedFlows, context, evidence }
@@ -326,7 +332,7 @@ function estimateComplexity(
 }
 
 // =============================================================================
-// Ceremony World (Ava8) - The Keeper
+// Ceremony perspective (Ava8) - The Keeper
 // =============================================================================
 
 /**
@@ -363,18 +369,19 @@ export function ceremonyIntentKeywords(): Record<string, string[]> {
 }
 
 /**
- * Ava8's perspective: The Keeper (Ceremony-world)
+ * Ava8's perspective: The Keeper (Ceremony perspective)
  *
  * Focuses on:
  * - Who contributed and their state
- * - Relational dynamics (K'é)
+ * - Relational dynamics: the contributor count (individual, pair or community)
+ *   and whether the work is collaborative
  * - Witnessing and acknowledgment
  * - Seven-generation awareness
  */
 export function analyzeCeremonyPerspective(
-  state: ThreeUniverseState,
+  state: ThreePerspectiveState,
   keywords: IntentKeywordMap = ceremonyIntentKeywords()
-): ThreeUniverseState {
+): ThreePerspectiveState {
   const event = state.event;
 
   // Extract contributor information
@@ -445,8 +452,8 @@ export function analyzeCeremonyPerspective(
     sevenGenerationRelevance: assessLongTermImpact(content, event),
   };
 
-  const perspective = createUniversePerspective(
-    Universe.CEREMONY,
+  const perspective = createPerspectiveReading(
+    PerspectiveType.CEREMONY,
     intent,
     confidence,
     { suggestedFlows, context, evidence }
@@ -624,7 +631,7 @@ function assessLongTermImpact(
 }
 
 // =============================================================================
-// Story Engine World (Miette) - The Weaver
+// Story Engine perspective (Miette) - The Weaver
 // =============================================================================
 
 /**
@@ -644,7 +651,7 @@ export function storyEngineIntentKeywords(): Record<string, string[]> {
 }
 
 /**
- * Miette's perspective: The Weaver (Story-engine-world)
+ * Miette's perspective: The Weaver (Story Engine perspective)
  *
  * Focuses on:
  * - Narrative position (which act/phase)
@@ -653,9 +660,9 @@ export function storyEngineIntentKeywords(): Record<string, string[]> {
  * - Character development
  */
 export function analyzeStoryEnginePerspective(
-  state: ThreeUniverseState,
+  state: ThreePerspectiveState,
   keywords: IntentKeywordMap = storyEngineIntentKeywords()
-): ThreeUniverseState {
+): ThreePerspectiveState {
   const event = state.event;
   const content = extractContent(event);
   const contentLower = content.toLowerCase();
@@ -734,8 +741,8 @@ export function analyzeStoryEnginePerspective(
     pacingSuggestion: suggestPacing(intent, dramaticTension),
   };
 
-  const perspective = createUniversePerspective(
-    Universe.STORY_ENGINE,
+  const perspective = createPerspectiveReading(
+    PerspectiveType.STORY_ENGINE,
     intent,
     confidence,
     { suggestedFlows, context, evidence }
@@ -838,12 +845,12 @@ function suggestPacing(intent: string, tension: number): string {
 // =============================================================================
 
 /**
- * Combine all three universe perspectives into a unified analysis.
+ * Combine the three perspective readings into a unified analysis.
  */
 export function synthesizePerspectives(
-  state: ThreeUniverseState,
+  state: ThreePerspectiveState,
   minConfidenceMargin: number = DEFAULT_MIN_CONFIDENCE_MARGIN
-): ThreeUniverseState {
+): ThreePerspectiveState {
   const engineer = state.engineerPerspective;
   const ceremony = state.ceremonyPerspective;
   const storyEngine = state.storyEnginePerspective;
@@ -855,14 +862,14 @@ export function synthesizePerspectives(
     };
   }
 
-  // Determine lead universe based on confidence and special conditions
-  const lead = determineLeadUniverse(engineer, ceremony, storyEngine);
+  // Determine lead perspective based on confidence and special conditions
+  const lead = determineLeadPerspective(engineer, ceremony, storyEngine);
 
   // Calculate coherence
   const coherence = calculateCoherence(engineer, ceremony, storyEngine);
 
   // How decisively was the lead won? A small margin between the two most
-  // confident universes means the winner is close to a coin-flip.
+  // confident perspectives means the winner is close to a coin-flip.
   const sorted = [
     engineer.confidence,
     ceremony.confidence,
@@ -872,7 +879,7 @@ export function synthesizePerspectives(
   const ambiguous = leadMargin < minConfidenceMargin;
 
   // Build the analysis
-  const analysis = createThreeUniverseAnalysis(
+  const analysis = createThreePerspectiveAnalysis(
     engineer,
     ceremony,
     storyEngine,
@@ -884,13 +891,13 @@ export function synthesizePerspectives(
   return {
     ...state,
     analysis,
-    leadUniverse: lead,
+    leadPerspective: lead,
     coherenceScore: coherence,
   };
 }
 
 /**
- * Determine which universe should lead the response.
+ * Determine which perspective should lead the response.
  *
  * Priority logic:
  * 1. CEREMONY leads if: new contributor, sacred pause needed, relational obligation
@@ -898,50 +905,50 @@ export function synthesizePerspectives(
  * 3. ENGINEER leads if: technical precision critical, schema validation required
  * 4. Otherwise: highest confidence wins
  */
-function determineLeadUniverse(
-  engineer: UniversePerspective,
-  ceremony: UniversePerspective,
-  storyEngine: UniversePerspective
-): Universe {
+function determineLeadPerspective(
+  engineer: PerspectiveReading,
+  ceremony: PerspectiveReading,
+  storyEngine: PerspectiveReading
+): PerspectiveType {
   const ceremonyContext = ceremony.context;
 
   // Check ceremony priority conditions
   if (ceremonyContext.witnessingNeeded) {
-    return Universe.CEREMONY;
+    return PerspectiveType.CEREMONY;
   }
   if (ceremonyContext.isCollaborative) {
-    // Collaborative work honors the ceremony world
-    return Universe.CEREMONY;
+    // Collaborative work is led by the ceremony perspective
+    return PerspectiveType.CEREMONY;
   }
 
   // Check story engine priority conditions
   const storyContext = storyEngine.context;
   if ((storyContext.dramaticTension as number) > 0.8) {
     // High drama moments are led by story engine
-    return Universe.STORY_ENGINE;
+    return PerspectiveType.STORY_ENGINE;
   }
   if (
     storyContext.narrativeFunction === "climax" ||
     storyContext.narrativeFunction === "turning_point"
   ) {
-    return Universe.STORY_ENGINE;
+    return PerspectiveType.STORY_ENGINE;
   }
 
   // Check engineer priority conditions
   const engineerContext = engineer.context;
   if (engineerContext.estimatedComplexity === "high") {
-    return Universe.ENGINEER;
+    return PerspectiveType.ENGINEER;
   }
   if (engineer.intent === "security" || engineer.intent === "bug_fix") {
     // Technical urgency
-    return Universe.ENGINEER;
+    return PerspectiveType.ENGINEER;
   }
 
   // Default: highest confidence
-  const perspectives: [UniversePerspective, Universe][] = [
-    [engineer, Universe.ENGINEER],
-    [ceremony, Universe.CEREMONY],
-    [storyEngine, Universe.STORY_ENGINE],
+  const perspectives: [PerspectiveReading, PerspectiveType][] = [
+    [engineer, PerspectiveType.ENGINEER],
+    [ceremony, PerspectiveType.CEREMONY],
+    [storyEngine, PerspectiveType.STORY_ENGINE],
   ];
 
   return perspectives.reduce((a, b) =>
@@ -956,9 +963,9 @@ function determineLeadUniverse(
  * Lower coherence might indicate conflicting interpretations.
  */
 function calculateCoherence(
-  engineer: UniversePerspective,
-  ceremony: UniversePerspective,
-  storyEngine: UniversePerspective
+  engineer: PerspectiveReading,
+  ceremony: PerspectiveReading,
+  storyEngine: PerspectiveReading
 ): number {
   // Base: average confidence
   const avgConfidence =
@@ -997,30 +1004,30 @@ function calculateCoherence(
 // =============================================================================
 
 /**
- * High-level interface for three-universe event processing.
+ * High-level interface for three-perspective event processing.
  *
  * @example
- * const processor = new ThreeUniverseProcessor();
+ * const processor = new ThreePerspectiveProcessor();
  * const result = processor.process(event);
- * console.log(result.leadUniverse);  // "ceremony"
+ * console.log(result.leadPerspective);  // "ceremony"
  *
  * @example With tracing callback
  * const handler = new NarrativeTracingHandler({ storyId: "story_123" });
  * const bridge = new LangGraphBridge(handler);
- * const processor = new ThreeUniverseProcessor({
- *   tracingCallback: bridge.createThreeUniverseCallback()
+ * const processor = new ThreePerspectiveProcessor({
+ *   tracingCallback: bridge.createThreePerspectiveCallback()
  * });
  * const result = processor.process(event);  // Automatically traced to Langfuse
  */
 /**
- * Options for {@link ThreeUniverseProcessor}.
+ * Options for {@link ThreePerspectiveProcessor}.
  */
-export interface ThreeUniverseProcessorOptions {
+export interface ThreePerspectiveProcessorOptions {
   tracingCallback?: AnalysisCallback;
   /**
-   * Override any universe's lexicon. Merged over the built-in keywords, so you
-   * only supply the vocabulary that is specific to your domain. Pass a whole
-   * map to replace a universe's lexicon outright.
+   * Override any perspective's lexicon. Merged over the built-in keywords, so
+   * you only supply the vocabulary that is specific to your domain. Pass a whole
+   * map to replace a perspective's lexicon outright.
    */
   keywords?: {
     engineer?: IntentKeywordMap;
@@ -1034,14 +1041,19 @@ export interface ThreeUniverseProcessorOptions {
   minConfidenceMargin?: number;
 }
 
-export class ThreeUniverseProcessor {
+/**
+ * @deprecated use ThreePerspectiveProcessorOptions
+ */
+export type ThreeUniverseProcessorOptions = ThreePerspectiveProcessorOptions;
+
+export class ThreePerspectiveProcessor {
   private tracingCallback?: AnalysisCallback;
   private engineerKeywords: IntentKeywordMap;
   private ceremonyKeywords: IntentKeywordMap;
   private storyEngineKeywords: IntentKeywordMap;
   private minConfidenceMargin: number;
 
-  constructor(options: ThreeUniverseProcessorOptions = {}) {
+  constructor(options: ThreePerspectiveProcessorOptions = {}) {
     this.tracingCallback = options.tracingCallback;
     this.engineerKeywords = {
       ...engineerIntentKeywords(),
@@ -1060,23 +1072,23 @@ export class ThreeUniverseProcessor {
   }
 
   /**
-   * Process an event through all three universes.
+   * Read an event from all three perspectives.
    *
    * @param event The event data (webhook payload, user input, etc.)
    * @param eventType Type of event (e.g., "github.push", "user.input")
-   * @returns ThreeUniverseAnalysis with all perspectives and synthesis
+   * @returns ThreePerspectiveAnalysis with all readings and synthesis
    */
   process(
     event: Record<string, unknown>,
     eventType: string = "unknown"
-  ): ThreeUniverseAnalysis {
+  ): ThreePerspectiveAnalysis {
     // Initialize state
-    let state: ThreeUniverseState = {
+    let state: ThreePerspectiveState = {
       event,
       eventType,
     };
 
-    // Process through each universe
+    // Read from each perspective
     state = analyzeEngineerPerspective(state, this.engineerKeywords);
     state = analyzeCeremonyPerspective(state, this.ceremonyKeywords);
     state = analyzeStoryEnginePerspective(state, this.storyEngineKeywords);
@@ -1103,7 +1115,7 @@ export class ThreeUniverseProcessor {
         perspectiveToRecord(analysis.engineer),
         perspectiveToRecord(analysis.ceremony),
         perspectiveToRecord(analysis.storyEngine),
-        analysis.leadUniverse,
+        analysis.leadPerspective,
         analysis.coherenceScore
       );
     }
@@ -1139,7 +1151,7 @@ export class ThreeUniverseProcessor {
   /**
    * Convenience method for processing GitHub webhooks.
    */
-  processWebhook(webhookPayload: Record<string, unknown>): ThreeUniverseAnalysis {
+  processWebhook(webhookPayload: Record<string, unknown>): ThreePerspectiveAnalysis {
     // Determine event type from webhook
     let eventType = "github.push"; // Default
 
@@ -1162,7 +1174,7 @@ export class ThreeUniverseProcessor {
    */
   createBeatFromAnalysis(
     event: Record<string, unknown>,
-    analysis: ThreeUniverseAnalysis,
+    analysis: ThreePerspectiveAnalysis,
     sequence: number
   ): StoryBeat {
     // Map story engine intent to NarrativeFunction
@@ -1199,8 +1211,8 @@ export class ThreeUniverseProcessor {
     }
 
     return createStoryBeat(beatId, sequence, content.slice(0, 500), narrativeFunc, act, {
-      universeAnalysis: analysis,
-      leadUniverse: analysis.leadUniverse,
+      perspectiveAnalysis: analysis,
+      leadPerspective: analysis.leadPerspective,
       source: "processor",
       sourceEventId,
     });
@@ -1208,13 +1220,22 @@ export class ThreeUniverseProcessor {
 }
 
 /**
- * Convert a UniversePerspective to a plain record.
+ * @deprecated use ThreePerspectiveProcessor
+ */
+export const ThreeUniverseProcessor = ThreePerspectiveProcessor;
+/**
+ * @deprecated use ThreePerspectiveProcessor
+ */
+export type ThreeUniverseProcessor = ThreePerspectiveProcessor;
+
+/**
+ * Convert a PerspectiveReading to a plain record.
  */
 function perspectiveToRecord(
-  perspective: UniversePerspective
+  perspective: PerspectiveReading
 ): Record<string, unknown> {
   return {
-    universe: perspective.universe,
+    perspectiveType: perspective.perspectiveType,
     intent: perspective.intent,
     confidence: perspective.confidence,
     suggestedFlows: perspective.suggestedFlows,

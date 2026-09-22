@@ -11,19 +11,54 @@
  */
 
 /**
- * The three interpretive universes from multiverse_3act
+ * The three perspectives from multiverse_3act: three readings of one event.
+ * Stored values are the bare `engineer`, `ceremony` and `story_engine`.
  */
-export enum Universe {
+export enum PerspectiveType {
   ENGINEER = "engineer", // Mia - The Builder
   CEREMONY = "ceremony", // Ava8 - The Keeper
   STORY_ENGINE = "story_engine", // Miette - The Weaver
 }
 
 /**
- * Single universe's interpretation of an event
+ * @deprecated use PerspectiveType
  */
-export interface UniversePerspective {
-  universe: Universe;
+export const Universe = PerspectiveType;
+/**
+ * @deprecated use PerspectiveType
+ */
+export type Universe = PerspectiveType;
+
+/**
+ * Legacy spellings of the perspective values, mapped to the bare values.
+ */
+const LEGACY_PERSPECTIVE_VALUES: Record<string, PerspectiveType> = {
+  "engineer-world": PerspectiveType.ENGINEER,
+  "ceremony-world": PerspectiveType.CEREMONY,
+  "story-engine-world": PerspectiveType.STORY_ENGINE,
+};
+
+const PERSPECTIVE_VALUES = new Set<string>(Object.values(PerspectiveType));
+
+/**
+ * Read a stored perspective value. Returns the bare value for `engineer`,
+ * `ceremony` and `story_engine`, maps the legacy `engineer-world`,
+ * `ceremony-world` and `story-engine-world` forms to them, and returns
+ * `undefined` for anything else.
+ */
+export function normalizePerspectiveType(
+  value: unknown
+): PerspectiveType | undefined {
+  if (typeof value !== "string") return undefined;
+  if (PERSPECTIVE_VALUES.has(value)) return value as PerspectiveType;
+  return LEGACY_PERSPECTIVE_VALUES[value];
+}
+
+/**
+ * One perspective's reading of an event
+ */
+export interface PerspectiveReading {
+  perspectiveType: PerspectiveType;
   intent: string;
   confidence: number;
   suggestedFlows: string[];
@@ -38,16 +73,21 @@ export interface UniversePerspective {
 }
 
 /**
- * Create a UniversePerspective
+ * @deprecated use PerspectiveReading
  */
-export function createUniversePerspective(
-  universe: Universe,
+export type UniversePerspective = PerspectiveReading;
+
+/**
+ * Create a PerspectiveReading
+ */
+export function createPerspectiveReading(
+  perspectiveType: PerspectiveType,
   intent: string,
   confidence: number,
-  options: Partial<UniversePerspective> = {}
-): UniversePerspective {
+  options: Partial<PerspectiveReading> = {}
+): PerspectiveReading {
   return {
-    universe,
+    perspectiveType,
     intent,
     confidence,
     suggestedFlows: options.suggestedFlows ?? [],
@@ -57,18 +97,23 @@ export function createUniversePerspective(
 }
 
 /**
- * Complete three-universe analysis of an event
+ * @deprecated use createPerspectiveReading
  */
-export interface ThreeUniverseAnalysis {
-  engineer: UniversePerspective;
-  ceremony: UniversePerspective;
-  storyEngine: UniversePerspective;
-  leadUniverse: Universe;
+export const createUniversePerspective = createPerspectiveReading;
+
+/**
+ * Complete three-perspective analysis of an event
+ */
+export interface ThreePerspectiveAnalysis {
+  engineer: PerspectiveReading;
+  ceremony: PerspectiveReading;
+  storyEngine: PerspectiveReading;
+  leadPerspective: PerspectiveType;
   coherenceScore: number;
   timestamp: string;
   /**
-   * Confidence distance between the winning universe and the runner-up. A small
-   * margin means the lead is barely decided — see `ambiguous`.
+   * Confidence distance between the winning perspective and the runner-up. A
+   * small margin means the lead is barely decided — see `ambiguous`.
    */
   leadMargin: number;
   /**
@@ -80,21 +125,26 @@ export interface ThreeUniverseAnalysis {
 }
 
 /**
- * Create a ThreeUniverseAnalysis
+ * @deprecated use ThreePerspectiveAnalysis
  */
-export function createThreeUniverseAnalysis(
-  engineer: UniversePerspective,
-  ceremony: UniversePerspective,
-  storyEngine: UniversePerspective,
-  leadUniverse: Universe,
+export type ThreeUniverseAnalysis = ThreePerspectiveAnalysis;
+
+/**
+ * Create a ThreePerspectiveAnalysis
+ */
+export function createThreePerspectiveAnalysis(
+  engineer: PerspectiveReading,
+  ceremony: PerspectiveReading,
+  storyEngine: PerspectiveReading,
+  leadPerspective: PerspectiveType,
   coherenceScore: number,
   options: { leadMargin?: number; ambiguous?: boolean } = {}
-): ThreeUniverseAnalysis {
+): ThreePerspectiveAnalysis {
   return {
     engineer,
     ceremony,
     storyEngine,
-    leadUniverse,
+    leadPerspective,
     coherenceScore,
     timestamp: new Date().toISOString(),
     leadMargin: options.leadMargin ?? 0,
@@ -103,18 +153,23 @@ export function createThreeUniverseAnalysis(
 }
 
 /**
- * Get perspective for a specific universe
+ * @deprecated use createThreePerspectiveAnalysis
+ */
+export const createThreeUniverseAnalysis = createThreePerspectiveAnalysis;
+
+/**
+ * Get the reading for one perspective
  */
 export function getPerspective(
-  analysis: ThreeUniverseAnalysis,
-  universe: Universe
-): UniversePerspective {
-  switch (universe) {
-    case Universe.ENGINEER:
+  analysis: ThreePerspectiveAnalysis,
+  perspectiveType: PerspectiveType
+): PerspectiveReading {
+  switch (perspectiveType) {
+    case PerspectiveType.ENGINEER:
       return analysis.engineer;
-    case Universe.CEREMONY:
+    case PerspectiveType.CEREMONY:
       return analysis.ceremony;
-    case Universe.STORY_ENGINE:
+    case PerspectiveType.STORY_ENGINE:
       return analysis.storyEngine;
   }
 }
@@ -169,7 +224,7 @@ export interface NarrativePosition {
   characterArcStrength: number;
   thematicResonance: number;
   emotionalTone: string;
-  leadUniverse: Universe;
+  leadPerspective: PerspectiveType;
 }
 
 /**
@@ -186,12 +241,12 @@ export function createNarrativePosition(
     characterArcStrength: options.characterArcStrength ?? 0.5,
     thematicResonance: options.thematicResonance ?? 0.5,
     emotionalTone: options.emotionalTone ?? "neutral",
-    leadUniverse: options.leadUniverse ?? Universe.STORY_ENGINE,
+    leadPerspective: options.leadPerspective ?? PerspectiveType.STORY_ENGINE,
   };
 }
 
 /**
- * A single story beat with three-universe perspectives
+ * A single story beat with its three-perspective analysis
  */
 export interface StoryBeat {
   id: string;
@@ -200,9 +255,9 @@ export interface StoryBeat {
   narrativeFunction: NarrativeFunction;
   act: number;
 
-  // Three-universe analysis
-  universeAnalysis?: ThreeUniverseAnalysis;
-  leadUniverse: Universe;
+  // Three-perspective analysis
+  perspectiveAnalysis?: ThreePerspectiveAnalysis;
+  leadPerspective: PerspectiveType;
 
   // Emotional/thematic data
   emotionalTone: string;
@@ -239,8 +294,8 @@ export function createStoryBeat(
     content,
     narrativeFunction,
     act,
-    universeAnalysis: options.universeAnalysis,
-    leadUniverse: options.leadUniverse ?? Universe.STORY_ENGINE,
+    perspectiveAnalysis: options.perspectiveAnalysis,
+    leadPerspective: options.leadPerspective ?? PerspectiveType.STORY_ENGINE,
     emotionalTone: options.emotionalTone ?? "neutral",
     thematicTags: options.thematicTags ?? [],
     characterId: options.characterId,
@@ -260,7 +315,7 @@ export interface CharacterState {
   id: string;
   name: string;
   archetype: string;
-  universe: Universe;
+  perspectiveType: PerspectiveType;
 
   // Arc tracking
   arcPosition: number;
@@ -283,14 +338,14 @@ export function createCharacterState(
   id: string,
   name: string,
   archetype: string,
-  universe: Universe,
+  perspectiveType: PerspectiveType,
   options: Partial<CharacterState> = {}
 ): CharacterState {
   return {
     id,
     name,
     archetype,
-    universe,
+    perspectiveType,
     arcPosition: options.arcPosition ?? 0.0,
     initialState: options.initialState ?? "",
     currentState: options.currentState ?? "",
@@ -343,7 +398,7 @@ export interface RoutingDecision {
   id: string;
   backend: string;
   flow: string;
-  universeAnalysis: ThreeUniverseAnalysis;
+  perspectiveAnalysis: ThreePerspectiveAnalysis;
   narrativePosition: NarrativePosition;
 
   // Decision factors
@@ -365,7 +420,7 @@ export function createRoutingDecision(
   id: string,
   backend: string,
   flow: string,
-  universeAnalysis: ThreeUniverseAnalysis,
+  perspectiveAnalysis: ThreePerspectiveAnalysis,
   narrativePosition: NarrativePosition,
   score: number,
   options: Partial<RoutingDecision> = {}
@@ -374,7 +429,7 @@ export function createRoutingDecision(
     id,
     backend,
     flow,
-    universeAnalysis,
+    perspectiveAnalysis,
     narrativePosition,
     score,
     method: options.method ?? "narrative",
@@ -466,7 +521,7 @@ export function addBeat(state: UnifiedNarrativeState, beat: StoryBeat): void {
   state.beats.push(beat);
   state.position.beatCount = state.beats.length;
   state.position.currentBeatId = beat.id;
-  state.position.leadUniverse = beat.leadUniverse;
+  state.position.leadPerspective = beat.leadPerspective;
 
   // Update act based on narrative function
   if (beat.narrativeFunction === NarrativeFunction.INCITING_INCIDENT) {
@@ -556,7 +611,11 @@ export function calculateCoherence(state: UnifiedNarrativeState): number {
   }
 
   const recentDecisions = state.routingDecisions.slice(-20);
-  const coherences = recentDecisions.map((rd) => rd.universeAnalysis.coherenceScore);
+  // Routing history has no TTL, so decisions recorded before the perspective
+  // rename carry `universeAnalysis`. Read either key.
+  const coherences = recentDecisions.map(
+    (rd) => readPerspectiveAnalysisField(rd as unknown as LooseRecord)!.coherenceScore
+  );
   state.overallCoherence =
     coherences.reduce((a, b) => a + b, 0) / coherences.length;
 
@@ -601,7 +660,7 @@ export function getDefaultCharacters(): Record<string, CharacterState> {
       "the-builder",
       "Mia",
       "The Builder",
-      Universe.ENGINEER,
+      PerspectiveType.ENGINEER,
       {
         initialState: "Analytical, focused on structural integrity",
         currentState: "Analytical, focused on structural integrity",
@@ -611,7 +670,7 @@ export function getDefaultCharacters(): Record<string, CharacterState> {
       "the-keeper",
       "Ava8",
       "The Keeper",
-      Universe.CEREMONY,
+      PerspectiveType.CEREMONY,
       {
         initialState: "Reverent, guardian of relational protocols",
         currentState: "Reverent, guardian of relational protocols",
@@ -621,7 +680,7 @@ export function getDefaultCharacters(): Record<string, CharacterState> {
       "the-weaver",
       "Miette",
       "The Weaver",
-      Universe.STORY_ENGINE,
+      PerspectiveType.STORY_ENGINE,
       {
         initialState: "Playful, sees narrative patterns in chaos",
         currentState: "Playful, sees narrative patterns in chaos",
@@ -642,7 +701,7 @@ export function getDefaultThemes(): Record<string, ThematicThread> {
     ),
     collaboration: createThematicThread(
       "collaboration",
-      "Cross-Universe Collaboration",
+      "Cross-Perspective Collaboration",
       "Three perspectives learning to work together while maintaining distinction"
     ),
     coherence: createThematicThread(
@@ -659,14 +718,14 @@ export function getDefaultThemes(): Record<string, ThematicThread> {
 export function createBeatFromWebhook(
   eventId: string,
   content: string,
-  universeAnalysis: ThreeUniverseAnalysis,
+  perspectiveAnalysis: ThreePerspectiveAnalysis,
   sequence: number
 ): StoryBeat {
-  const storyEngineContext = universeAnalysis.storyEngine.context;
+  const storyEngineContext = perspectiveAnalysis.storyEngine.context;
   const act = (storyEngineContext.act as number) || 2;
 
   const narrativeFunction: NarrativeFunction = getNarrativeFunctionFromString(
-    universeAnalysis.storyEngine.intent
+    perspectiveAnalysis.storyEngine.intent
   );
 
   return createStoryBeat(
@@ -676,8 +735,8 @@ export function createBeatFromWebhook(
     narrativeFunction,
     act,
     {
-      universeAnalysis,
-      leadUniverse: universeAnalysis.leadUniverse,
+      perspectiveAnalysis,
+      leadPerspective: perspectiveAnalysis.leadPerspective,
       source: "webhook",
       sourceEventId: eventId,
     }
@@ -705,8 +764,167 @@ export function serializeState(state: UnifiedNarrativeState): string {
 }
 
 /**
- * Deserialize state from JSON
+ * Deserialize state from JSON. Accepts states stored before the perspective
+ * rename (see {@link normalizeUnifiedNarrativeState}).
  */
 export function deserializeState(json: string): UnifiedNarrativeState {
-  return JSON.parse(json) as UnifiedNarrativeState;
+  return normalizeUnifiedNarrativeState(JSON.parse(json));
+}
+
+// ============================================================================
+// Readers for stored records
+//
+// Redis values written before the perspective rename carry `universe`,
+// `leadUniverse` and `universeAnalysis`. The readers below accept those keys
+// and the current ones, return records with the current keys only, and map
+// legacy `*-world` perspective values to the bare values.
+// ============================================================================
+
+type LooseRecord = Record<string, unknown>;
+
+function isRecord(value: unknown): value is LooseRecord {
+  return typeof value === "object" && value !== null && !Array.isArray(value);
+}
+
+/**
+ * Pick a perspective value from the current key or the legacy key. Known
+ * values are normalized. An unknown value is kept as stored.
+ */
+function readPerspectiveField(
+  record: LooseRecord,
+  key: string,
+  legacyKey: string
+): PerspectiveType | undefined {
+  const raw = record[key] ?? record[legacyKey];
+  return normalizePerspectiveType(raw) ?? (raw as PerspectiveType | undefined);
+}
+
+function readPerspectiveAnalysisField(
+  record: LooseRecord
+): ThreePerspectiveAnalysis | undefined {
+  const raw = record.perspectiveAnalysis ?? record.universeAnalysis;
+  return raw === undefined ? undefined : normalizeThreePerspectiveAnalysis(raw);
+}
+
+/**
+ * Read a stored perspective reading. Accepts `perspectiveType` or the legacy
+ * `universe` key.
+ */
+export function normalizePerspectiveReading(raw: unknown): PerspectiveReading {
+  if (!isRecord(raw)) return raw as PerspectiveReading;
+  const { universe: _legacy, ...rest } = raw;
+  return {
+    ...rest,
+    perspectiveType: readPerspectiveField(raw, "perspectiveType", "universe"),
+  } as PerspectiveReading;
+}
+
+/**
+ * Read a stored three-perspective analysis (for example an `ncp:event:*`
+ * value). Accepts `leadPerspective` or the legacy `leadUniverse` key, and
+ * legacy keys on each reading.
+ */
+export function normalizeThreePerspectiveAnalysis(
+  raw: unknown
+): ThreePerspectiveAnalysis {
+  if (!isRecord(raw)) return raw as ThreePerspectiveAnalysis;
+  const { leadUniverse: _legacy, ...rest } = raw;
+  const analysis: LooseRecord = {
+    ...rest,
+    leadPerspective: readPerspectiveField(raw, "leadPerspective", "leadUniverse"),
+  };
+  for (const key of ["engineer", "ceremony", "storyEngine"]) {
+    if (raw[key] !== undefined) {
+      analysis[key] = normalizePerspectiveReading(raw[key]);
+    }
+  }
+  return analysis as unknown as ThreePerspectiveAnalysis;
+}
+
+function normalizeNarrativePosition(raw: unknown): NarrativePosition {
+  if (!isRecord(raw)) return raw as NarrativePosition;
+  const { leadUniverse: _legacy, ...rest } = raw;
+  return {
+    ...rest,
+    leadPerspective:
+      readPerspectiveField(raw, "leadPerspective", "leadUniverse") ??
+      PerspectiveType.STORY_ENGINE,
+  } as NarrativePosition;
+}
+
+/**
+ * Read a stored story beat (for example an `ncp:beat:*` value). Accepts
+ * `leadPerspective` / `perspectiveAnalysis` or the legacy `leadUniverse` /
+ * `universeAnalysis` keys.
+ */
+export function normalizeStoryBeat(raw: unknown): StoryBeat {
+  if (!isRecord(raw)) return raw as StoryBeat;
+  const { leadUniverse: _lead, universeAnalysis: _analysis, ...rest } = raw;
+  const beat: LooseRecord = {
+    ...rest,
+    leadPerspective:
+      readPerspectiveField(raw, "leadPerspective", "leadUniverse") ??
+      PerspectiveType.STORY_ENGINE,
+  };
+  const analysis = readPerspectiveAnalysisField(raw);
+  if (analysis !== undefined) {
+    beat.perspectiveAnalysis = analysis;
+  }
+  return beat as unknown as StoryBeat;
+}
+
+function normalizeCharacterState(raw: unknown): CharacterState {
+  if (!isRecord(raw)) return raw as CharacterState;
+  const { universe: _legacy, ...rest } = raw;
+  return {
+    ...rest,
+    perspectiveType: readPerspectiveField(raw, "perspectiveType", "universe"),
+  } as CharacterState;
+}
+
+/**
+ * Read a stored routing decision (for example an `ncp:routing:*` entry).
+ * Accepts `perspectiveAnalysis` or the legacy `universeAnalysis` key.
+ */
+export function normalizeRoutingDecision(raw: unknown): RoutingDecision {
+  if (!isRecord(raw)) return raw as RoutingDecision;
+  const { universeAnalysis: _legacy, ...rest } = raw;
+  const decision: LooseRecord = { ...rest };
+  const analysis = readPerspectiveAnalysisField(raw);
+  if (analysis !== undefined) {
+    decision.perspectiveAnalysis = analysis;
+  }
+  if (raw.narrativePosition !== undefined) {
+    decision.narrativePosition = normalizeNarrativePosition(raw.narrativePosition);
+  }
+  return decision as unknown as RoutingDecision;
+}
+
+/**
+ * Read a stored unified state (an `ncp:state:*` value), normalizing its
+ * position, beats, characters and routing decisions.
+ */
+export function normalizeUnifiedNarrativeState(
+  raw: unknown
+): UnifiedNarrativeState {
+  if (!isRecord(raw)) return raw as UnifiedNarrativeState;
+  const state: LooseRecord = { ...raw };
+  if (raw.position !== undefined) {
+    state.position = normalizeNarrativePosition(raw.position);
+  }
+  if (Array.isArray(raw.beats)) {
+    state.beats = raw.beats.map(normalizeStoryBeat);
+  }
+  if (Array.isArray(raw.routingDecisions)) {
+    state.routingDecisions = raw.routingDecisions.map(normalizeRoutingDecision);
+  }
+  if (isRecord(raw.characters)) {
+    state.characters = Object.fromEntries(
+      Object.entries(raw.characters).map(([id, character]) => [
+        id,
+        normalizeCharacterState(character),
+      ])
+    );
+  }
+  return state as unknown as UnifiedNarrativeState;
 }

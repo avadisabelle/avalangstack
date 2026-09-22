@@ -4,7 +4,7 @@
  * Narrative Intelligence Toolkit for JavaScript/TypeScript
  *
  * This package provides the core narrative intelligence components:
- * - Three-Universe Processing (Engineer/Ceremony/Story Engine perspectives)
+ * - Three-Perspective Processing (Engineer/Ceremony/Story Engine readings of each event)
  * - Narrative Coherence Analysis
  * - Story Beat Classification
  * - State Management with Redis
@@ -13,15 +13,15 @@
  *
  * @example
  * import {
- *   ThreeUniverseProcessor,
+ *   ThreePerspectiveProcessor,
  *   NarrativeCoherenceEngine,
  *   createUnifiedNarrativeState,
  * } from "@ava/narrative-intelligence";
  *
- * // Process an event through three universes
- * const processor = new ThreeUniverseProcessor();
+ * // Read an event from three perspectives
+ * const processor = new ThreePerspectiveProcessor();
  * const analysis = processor.process({ content: "Add new feature" }, "github.push");
- * console.log(`Lead universe: ${analysis.leadUniverse}`);
+ * console.log(`Lead perspective: ${analysis.leadPerspective}`);
  *
  * // Analyze narrative coherence
  * const engine = new NarrativeCoherenceEngine();
@@ -36,12 +36,12 @@
 
 export {
   // Enums
-  Universe,
+  PerspectiveType,
   NarrativePhase,
   NarrativeFunction,
   // Interfaces
-  UniversePerspective,
-  ThreeUniverseAnalysis,
+  PerspectiveReading,
+  ThreePerspectiveAnalysis,
   NarrativePosition,
   StoryBeat,
   CharacterState,
@@ -49,8 +49,8 @@ export {
   RoutingDecision,
   UnifiedNarrativeState,
   // Factory functions
-  createUniversePerspective,
-  createThreeUniverseAnalysis,
+  createPerspectiveReading,
+  createThreePerspectiveAnalysis,
   getPerspective,
   createNarrativePosition,
   createStoryBeat,
@@ -75,6 +75,19 @@ export {
   RedisKeys,
   serializeState,
   deserializeState,
+  // Readers for stored records (accept pre-rename keys)
+  normalizePerspectiveType,
+  normalizePerspectiveReading,
+  normalizeThreePerspectiveAnalysis,
+  normalizeStoryBeat,
+  normalizeRoutingDecision,
+  normalizeUnifiedNarrativeState,
+  // Deprecated aliases (pre-rename names)
+  Universe,
+  UniversePerspective,
+  ThreeUniverseAnalysis,
+  createUniversePerspective,
+  createThreeUniverseAnalysis,
 } from "./schemas/unified_state_bridge.js";
 
 export {
@@ -109,13 +122,13 @@ export {
 // ============================================================================
 
 export {
-  // Three Universe Processor
+  // Three-Perspective Processor
   EventType,
   ProcessedEvent,
-  ThreeUniverseState,
+  ThreePerspectiveState,
   AnalysisCallback,
   IntentKeywordMap,
-  ThreeUniverseProcessorOptions,
+  ThreePerspectiveProcessorOptions,
   NO_EVIDENCE_CONFIDENCE,
   DEFAULT_MIN_CONFIDENCE_MARGIN,
   engineerIntentKeywords,
@@ -125,8 +138,12 @@ export {
   analyzeCeremonyPerspective,
   analyzeStoryEnginePerspective,
   synthesizePerspectives,
+  ThreePerspectiveProcessor,
+  // Deprecated aliases (pre-rename names)
+  ThreeUniverseState,
+  ThreeUniverseProcessorOptions,
   ThreeUniverseProcessor,
-} from "./graphs/three_universe_processor.js";
+} from "./graphs/three_perspective_processor.js";
 
 export {
   // Coherence Engine
